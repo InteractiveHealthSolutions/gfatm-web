@@ -1,0 +1,232 @@
+<htmlform>
+    <macros>
+		paperFormId = (Fill this in)
+		headerColor =#009d8e
+		fontOnHeaderColor = white
+	</macros>
+	
+	<style>
+		.section {
+			border: 1px solid $headerColor;
+			padding: 2px;
+			text-align: left;
+			margin-bottom: 1em;
+		}
+		.sectionHeader {
+			background-color: $headerColor;
+			color: $fontOnHeaderColor;
+			display: block;
+			padding: 2px;
+			font-weight: bold;
+		}
+		table.baseline-aligned td {
+			vertical-align: baseline;
+		}
+	</style>
+	
+	<script type="text/javascript">
+	
+	       var startDate = new Date();
+		   var givenExternalId = '<lookup expression="patient.getPatientIdentifier(5)" />';
+		   
+		   var patientUuid = '';
+		   
+			function getPatientAndSavePatientIdentifiers(externalID) {
+			
+				var patientId =  '<lookup expression="patient.getPatientIdentifier(3)"/>';
+			
+				jQuery.ajax({
+						url: "/openmrs/ws/rest/v1/patient?q=" + patientId + "",
+						dataType: 'json'
+						}).done(function(data ) {
+					    
+						console.log("patient display : " + data.results[0]['display']);
+						console.log("patient uuid : " + data.results[0]['uuid']);
+						patientUuid = data.results[0]['uuid'];
+						savePatientIdentifiers(externalID, patientUuid);
+					});
+			}
+		   
+			function savePatientIdentifiers(externalID, patientUuid) {
+			var savedExternal = '';
+			
+			jQuery.ajax({
+					url: "/openmrs/ws/rest/v1/patient/" + patientUuid + "/identifier",
+                    processData: false,
+                    type: "POST",
+					data: JSON.stringify({"identifier": externalID, "identifierType": "20b16aaf-2851-4662-8292-0e7b89a82448", "preferred": false, "voided": false}),
+                    contentType: "application/json"
+					
+					}).done(function(data ) {
+						console.log("SUCCESS");
+						console.log("saved external is " + data['display']);
+						savedExternal = data['display'];
+						
+				});
+				
+			
+		}
+		   
+		   
+            if(jQuery){
+
+                    jQuery(document).ready(function(){
+						
+						var timeTakenDiv = jQuery("#time_taken_div");
+						timeTakenDiv.hide();
+						
+						if(!(givenExternalId == "")) {
+							jQuery('#external_id').val(givenExternalId);
+							jQuery("#external_id").prop("readonly", true);
+						}
+						else {
+							jQuery("#external_id").prop("readonly", false);
+						}
+						 
+						doRest();
+						getField("facility_treatment_reg.value").prop('readonly',true);
+						
+                    });
+					 
+				 
+					function doRest(){
+						jQuery.ajax({
+							url: "/openmrs/ws/rest/v1/location?v=custom:(uuid,display,name,description)&amp;tag=PMDT",
+							dataType: 'json'
+						}).done(function(data ) {
+							console.log(data.results[0].name);
+							console.log(data.results.length);
+							locationData = data;
+							populate(data);	
+					});
+				}
+				
+				function populate(data) {
+								
+					var s= document.getElementById('facility_list');
+					var facVal = getField("facility_treatment_reg.value").val();
+					
+					for (i = 0; i &lt; data.results.length; i++) {
+						if(facVal!="") {
+							if(facVal == data.results[i].name) {
+								s.options[i+1]= new Option(data.results[i].description, data.results[i].name, false, true); 
+							}
+							
+							else {
+								s.options[i+1]= new Option(data.results[i].description, data.results[i].name);
+							}
+						}
+						
+						else {
+							s.options[i+1]= new Option(data.results[i].description, data.results[i].name);                      
+						}
+						var resultObject =  JSON.parse(JSON.stringify(data.results[i].description || null));
+					}
+				}
+			}
+		   
+		   jQuery(function() { 
+			var facilities = document.getElementById("facility_list");
+				facilities.onchange = function(){
+					var e = document.getElementById("facility_list");
+					var locationDescription = e.options[e.selectedIndex].text;
+					var locationName = e.options[e.selectedIndex].value;
+				
+					setValue('facility_treatment_reg.value',locationName );				
+				}
+			});
+		   
+		    beforeSubmit.push(function() {
+  
+				myRegExp = new RegExp(/PAK-[0-9]{3,3}-[0-9]{5,5}-[0-9]{2,2}/);
+				setValue('facility_treatment_reg.error', '');
+				var valid = true;
+				
+				if(getValue('facility_treatment_reg.value')=='Please select location' || getValue('facility_treatment_reg.value')==''){
+					
+					getField('facility_treatment_reg.error').html('This field can not be empty').show();
+					valid=false;                
+				}
+				else {
+					getField('facility_treatment_reg.error').html('').hide();
+				}
+				
+				
+				if(valid==false){
+					return false;
+				}
+				else {
+				
+					var externalID = jQuery('#external_id').val();
+					
+					if(externalID != "") {
+						if(givenExternalId != externalID) {
+						   getPatientAndSavePatientIdentifiers(externalID);
+						}
+					}
+				
+					var endDate = new Date();
+					var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+					var diffSec = timeDiff/1000;
+					setValue("time_taken.value",diffSec);
+					
+					var timeTakenDiv = $j("#time_taken_div");
+					timeTakenDiv.show();
+					setValue("time_taken.value",diffSec);
+					timeTakenDiv.hide();
+					return true;
+				} 
+            });
+	
+	</script>
+   
+    <h2>PMDT - Treatment Registration Form</h2>
+
+	<section headerLabel="1. Encounter Details">
+		<table class="baseline-aligned">
+			<tr>
+				<td>Date:</td>
+				<td><encounterDate id="encounter_date" default="today" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Location:</td>
+				<td><encounterLocation id="encounter_location" default="2" required="true" tags="PMDT"/></td>
+			</tr>
+			<tr>
+				<td>Provider:</td>
+				<td><encounterProvider id="encounter_provider" default="currentUser" type="autocomplete"/></td>
+			</tr>
+			<tr>
+				<td><enrollInProgram programId="PMDT"/></td>
+			</tr>
+		</table>
+	</section>
+	
+	<section headerLabel="2. Treatment Registration Details">
+	    <table class="baseline-aligned">
+		<tr>
+			<td><obs id="tb_register" labelText = "Treatment Consent Form Signed?" conceptId="164917" answerConceptIds="1065,1066" answerLabels="Yes,No" required="true" defaultValue="1065"/></td>
+		</tr>
+		<tr>
+			<td><obs id="reg_date"  labelText = "Date of registration" conceptId="164412" required="true" defaultValue="now" allowTime="false" /></td>
+		</tr>
+		<tr>
+			<td>External ID: <input type="text" id="external_id" maxlength="20"></input> 
+			
+			</td>
+		</tr>
+		<tr>
+			<td>Registration Facility name <select id="facility_list" ><option>Please select location</option></select> 
+			<obs id="facility_treatment_reg" conceptId="164467" required="true" /></td>
+		</tr>
+		
+		<tr id="time_taken_div">
+            <td><obs id="time_taken" conceptId="165044" labelText = "Time Taken to Fill Form" /></td>
+        </tr>
+		 
+		</table>
+	</section>
+	
+	<submit/>
+	
+</htmlform>

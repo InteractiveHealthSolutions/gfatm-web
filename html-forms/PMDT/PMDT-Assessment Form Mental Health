@@ -1,0 +1,625 @@
+<htmlform>
+	
+	<macros>
+		paperFormId = (Fill this in)
+		headerColor =#009d8e
+		fontOnHeaderColor = white
+	</macros>
+
+	<style>
+		.section {
+			border: 1px solid $headerColor;
+			padding: 2px;
+			text-align: left;
+			margin-bottom: 1em;
+		}
+		.sectionHeader {
+			background-color: $headerColor;
+			color: $fontOnHeaderColor;
+			display: block;
+			padding: 2px;
+			font-weight: bold;
+		}
+		table.baseline-aligned td {
+			vertical-align: baseline;
+		}
+	</style>
+
+       <script type="text/javascript">
+	   var startDate = new Date();
+if(jQuery){
+
+ jQuery(document).ready(function(){
+	doRest();
+    //getField('preferred_location.value').change();
+	
+	///
+	<ifMode mode="VIEW" include="false">
+	
+	if( getValue('continuation_status.value')==151321 ){
+		jQuery('#return_visit_date').show();
+	}
+	else{
+		jQuery('#return_visit_date').hide();
+	}
+	
+	if(! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) )){
+		jQuery('#therapy_consent').show();
+	}
+	else{
+		jQuery('#therapy_consent').hide();
+	}
+
+	if( getValue('therapy_consent.value')==1065 &amp;&amp; ! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) )  ) {
+		///
+		jQuery('#treatment_facility_counselling_consent').show();
+		jQuery('#phone_counselling_consent').show();
+		jQuery('#preferred_location1').show();
+		///
+	}
+	else{
+		jQuery('#treatment_facility_counselling_consent').hide();
+		jQuery('#phone_counselling_consent').hide();
+		jQuery('#preferred_location1').hide();
+		
+	}
+	
+	/*var treatmentEncounters = "<lookup complexExpression="#foreach($encounter in $fn.allEncounters('f2038177-d0ee-4856-ab41-2b9bad0e949e'))  $fn.getObs($encounter, '164467').getValueAsString($!{locale}) #end"/>";
+	var treatmentEncounterResult = treatmentEncounters.replace(/\s\s+/g, '@');
+    var treatmentEncounterResultArray = treatmentEncounterResult.split('@');	
+	
+	var facility_treatment_reg = treatmentEncounterResultArray[treatmentEncounterResultArray.length-1];
+			
+	//alert(facility_treatment_reg);*/
+	
+	
+	</ifMode>
+	////
+	
+	var isLocation = true;
+<ifMode mode="VIEW">
+var isLocation = false;
+</ifMode>
+	
+var encounters1 = "<lookup complexExpression="#foreach($encounter in $fn.allEncounters('f6a6088e-2fa5-4498-8d6d-cb9dce24cf4d'))  $fn.getObs($encounter, '165160').getValueAsString($!{locale}) #end"/>";
+		   var result1 = encounters1.replace(/\s\s+/g, '@');
+           var resultValueArray1 = result1.split('@');		   
+		 
+		   var value1 = resultValueArray1[resultValueArray1.length-1];
+			
+		   /*if(value1=='')
+		   {
+		    value1="0";
+		   }*/
+
+           var sessionNumberValue = parseInt(value1);		   
+		
+		   <ifMode mode="ENTER">
+			if(isNaN(sessionNumberValue)){
+				sessionNumberValue='';
+			}
+		    setValue("rescreened_session_no.value", sessionNumberValue);
+		   
+		   </ifMode>
+
+if(isLocation) {
+document.getElementById('facility_list').style.display = 'block';
+
+}
+else {
+document.getElementById('facility_list').style.display = 'none';
+}
+	
+	getField("preferred_location.value").prop('disabled',true);   
+    
+    function calculateScore() {
+	
+	var displayVal = 	 getScoreValue( getField("akuads_interest_loss.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_hobby_interest_loss.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_sleep.value").children('option:selected').index()  ) + 
+				 getScoreValue( getField("akuads_anxious.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_doom_sensation.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_difficulty_thinking.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_alone.value").children('option:selected').index()  ) + 
+				 getScoreValue( getField("akuads_unhappy.value").children('option:selected').index()  ) + 
+				 getScoreValue( getField("akuads_hopeless.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_helpless.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_worried.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_cried.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_suicidal.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_appetite_loss.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_retrosternal_burning.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_indigestion.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_nausea.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_constipation.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_breathing_difficulty.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_tremulous.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_numbness.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_tension.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_headaches.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_body_pain.value").children('option:selected').index()  ) +
+				 getScoreValue( getField("akuads_frequent_urination.value").children('option:selected').index()  )   ; 
+				 
+
+    if(displayVal &lt; 0) {
+       displayVal = 0;
+    }
+   
+		<ifMode mode="VIEW" include="false">
+     setValue("akuads_score.value", displayVal );
+	 </ifMode>	
+     if(displayVal &gt;= 0 &amp;&amp; displayVal &lt; 21)  {
+        getField("akuads_severity.value").prop('selectedIndex', 1);
+     }
+     else if(displayVal &gt; 20 &amp;&amp; displayVal  &lt; 41) {
+       getField("akuads_severity.value").prop('selectedIndex', 2);
+     }
+     else if(displayVal &gt; 40 &amp;&amp; displayVal  &lt; 61) {
+       getField("akuads_severity.value").prop('selectedIndex', 3);
+     }
+      else if(displayVal &gt; 60 &amp;&amp; displayVal  &lt; 76) {
+       getField("akuads_severity.value").prop('selectedIndex', 4);
+     }
+      else {
+         getField("akuads_severity.value").prop('selectedIndex', 0);
+     }
+     getField("akuads_severity.value").prop('disabled','true');
+     //getField("akuads_severity.value").children('option:not(:selected)').prop('disabled',true);
+}
+function getScoreValue(value){
+	value = value &lt; 2 ? 0 : (value-1);
+	return value;
+}
+
+
+function toggleTherapyLocation() {
+  var consentVal = getField("therapy_consent.value").prop('selectedIndex');
+  
+  if(consentVal==1) {
+      getField("preferred_location.value").prop('disabled',false);   
+      
+        
+ }
+
+ else {
+         getField("preferred_location.value").val("");    
+         getField("preferred_location.value").prop('disabled',true);   
+ }
+
+
+
+}
+
+
+
+
+   
+	
+    getField("akuads_score.value").prop('readonly',true);
+    calculateScore();
+	getField("akuads_sleep.value").change(calculateScore);  
+	getField("akuads_interest_loss.value").change(calculateScore); 
+	getField("akuads_hobby_interest_loss.value").change(calculateScore); 
+    getField("akuads_anxious.value").change(calculateScore); 
+    getField("akuads_doom_sensation.value").change(calculateScore); 
+    getField("akuads_difficulty_thinking.value").change(calculateScore); 
+    getField("akuads_alone.value").change(calculateScore);  
+    getField("akuads_unhappy.value").change(calculateScore);  
+    getField("akuads_hopeless.value").change(calculateScore); 
+    getField("akuads_helpless.value").change(calculateScore); 
+    getField("akuads_worried.value").change(calculateScore); 
+    getField("akuads_cried.value").change(calculateScore); 
+    getField("akuads_suicidal.value").change(calculateScore); 
+    getField("akuads_appetite_loss.value").change(calculateScore); 
+    getField("akuads_retrosternal_burning.value").change(calculateScore); 
+    getField("akuads_indigestion.value").change(calculateScore); 
+    getField("akuads_nausea.value").change(calculateScore); 
+    getField("akuads_constipation.value").change(calculateScore); 
+    getField("akuads_breathing_difficulty.value").change(calculateScore); 
+    getField("akuads_tremulous.value").change(calculateScore); 
+    getField("akuads_numbness.value").change(calculateScore); 
+    getField("akuads_tension.value").change(calculateScore); 
+    getField("akuads_headaches.value").change(calculateScore); 
+    getField("akuads_body_pain.value").change(calculateScore); 
+    getField("akuads_frequent_urination.value").change(calculateScore);
+    //getField("therapy_consent.value").change(toggleTherapyLocation);
+	
+ });
+
+}
+
+function doRest(){
+			jQuery.ajax({
+				url: "/openmrs/ws/rest/v1/location?v=custom:(uuid,display,name,description)&amp;tag=PMDT",
+				dataType: 'json'
+				}).done(function(data ) {
+					console.log(data.results[0].name);
+					console.log(data.results.length);
+					locationData = data;
+					populate(data);
+			});
+		}
+		
+		function populate(data) {
+								
+			var s= document.getElementById('facility_list');
+			
+			for (i = 0; i &lt; data.results.length; i++) { 
+				s.options[i+1]= new Option(data.results[i].description, data.results[i].name);                      
+				var resultObject =  JSON.parse(JSON.stringify(data.results[i].description || null));
+			}
+			
+			getField("preferred_location.value").prop('disabled',false);
+			
+			<ifMode mode="ENTER">	
+			s.value = 'IHK-KHI';
+			setValue('preferred_location.value', 'IHK-KHI');
+			</ifMode>	
+			
+			getField("preferred_location.value").prop('disabled',true);
+		}
+
+jQuery(function() {
+			   
+			   getField('return_visit_date.value').change(function() {
+                    var CurrentFormDate = new Date(getValue('encounter_date.value'));
+					var ReturnVisitDate = new Date(getValue('return_visit_date.value'));
+					
+					if(ReturnVisitDate &lt; CurrentFormDate) {
+					   getField('return_visit_date.error').html('Next Appointment date should not be before encounter date. Please select correct date').show();
+					}
+					else {
+					   getField('return_visit_date.error').html('').hide();
+					}
+                                       
+				});
+				
+				getField('continuation_status.value').change(function() {
+					
+					if(getValue('continuation_status.value')==151321) {
+						jQuery('#return_visit_date').show();
+					}
+					else {
+						setValue('return_visit_date.value', '');
+						jQuery('#return_visit_date').hide();
+					}
+					
+					if( getValue('continuation_status.value')==165183 ||  getValue('continuation_status.value') == 1648 ) {
+						setValue('therapy_consent.value', '');
+						jQuery('#therapy_consent').hide();
+						getField('therapy_consent.value').change();
+					}
+					else {
+						jQuery('#therapy_consent').show();
+					}
+                                 
+				});							
+			
+				getField('therapy_consent.value').change(function() {
+				
+				    if(getValue('therapy_consent.value')==1065) {
+						var s= document.getElementById('facility_list');
+						s.value = 'IHK-KHI';
+						getField("preferred_location.value").prop('disabled',false);
+						setValue('preferred_location.value', 'IHK-KHI');
+						getField("preferred_location.value").prop('disabled',true);
+						
+						///
+						jQuery('#treatment_facility_counselling_consent').show();
+						jQuery('#phone_counselling_consent').show();
+						jQuery('#preferred_location1').show();
+						///
+					}
+					else{
+						jQuery('#treatment_facility_counselling_consent').hide();
+						jQuery('#phone_counselling_consent').hide();
+						jQuery('#preferred_location1').hide();
+						setValue("treatment_facility_counselling_consent.value","");
+						setValue("phone_counselling_consent.value","");
+						setValue("preferred_location.value","");
+						jQuery('#facility_list').val("");
+						
+					}
+					 
+				});
+			   
+			   var facilities = document.getElementById("facility_list");
+        facilities.onchange = function(){
+                var e = document.getElementById("facility_list");
+				var locationDescription = e.options[e.selectedIndex].text;
+                                var locationName = e.options[e.selectedIndex].value;
+			
+				setValue('preferred_location.value',locationName );
+                getField('preferred_location.value').change();
+										
+		};
+		});
+
+        function isNumber(n) {
+             return !isNaN(parseFloat(n)) &amp;&amp; isFinite(n);
+            }
+			
+		function isInteger(x) {
+         return (typeof x === 'number') &amp;&amp; x % 1 === 0;
+        }
+		
+beforeSubmit.push(function() {
+    var index = getField("akuads_severity.value").prop('selectedIndex');
+	var valid=true;
+	setValue('preferred_location.error', '');
+	setValue('return_visit_date.error', '');
+	setValue('phone_counselling_consent.error', '');
+	setValue('treatment_facility_counselling_consent.error', '');
+	setValue('therapy_consent.error', '');
+	setValue('rescreened_session_no.error', '');
+	
+	
+	 
+	
+        var CurrentFormDate = new Date(getValue('encounter_date.value'));
+		var ReturnVisitDate = new Date(getValue('return_visit_date.value'));
+			
+		if( getValue('continuation_status.value')==151321 &amp;&amp; getValue('return_visit_date.value')=='' ){
+			getField('return_visit_date.error').html('Please select a Date.').show();
+			valid = false;
+		}	
+		else if( getValue('continuation_status.value')==151321 &amp;&amp;  (ReturnVisitDate &lt; CurrentFormDate) ) {
+			getField('return_visit_date.error').html('Next Appointment date should not be less than Form Date. Please select correct Date').show();
+			valid = false;
+		}
+		else {
+			getField('return_visit_date.error').html('').hide();
+		}		
+
+		
+		if(getValue('followup_visit_type.value')==165037 &amp;&amp; getValue('other_assesment_reason.value')==''){
+                getField('other_assesment_reason.error').html('Please input a value.').show();
+                valid=false;                
+        }
+        else{
+                getField('other_assesment_reason.error').html('').hide();
+        }	
+
+		//
+		
+		if( getValue('therapy_consent.value')=='' &amp;&amp; ! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) ) ){
+                getField('therapy_consent.error').html('Please select a value.').show();
+                valid=false;                
+        }
+        else{
+                getField('therapy_consent.error').html('').hide();
+        }
+		//
+
+        if( getValue('therapy_consent.value')==1065 &amp;&amp; getValue('preferred_location.value')=='' &amp;&amp; ! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) )  ){
+                getField('preferred_location.error').html('Please select a Location.').show();
+                valid=false;                
+        }
+        else{
+                getField('preferred_location.error').html('').hide();
+        }
+ 
+        if( getValue('therapy_consent.value')==1065 &amp;&amp; getValue('phone_counselling_consent.value')=='' &amp;&amp; ! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) ) ){
+                getField('phone_counselling_consent.error').html('Please select a value.').show();
+                valid=false;                
+        }
+        else{
+                getField('phone_counselling_consent.error').html('').hide();
+        }
+
+        if( getValue('therapy_consent.value')==1065 &amp;&amp; getValue('treatment_facility_counselling_consent.value')=='' &amp;&amp; ! ( ( getValue('continuation_status.value')==165183 ) ||  ( getValue('continuation_status.value') == 1648 ) ) ){
+                getField('treatment_facility_counselling_consent.error').html('Please select a value.').show();
+                valid=false;                
+        }
+        else{
+                getField('treatment_facility_counselling_consent.error').html('').hide();
+        }
+
+		var rescreened_session_no=getValue('rescreened_session_no.value')
+		if( getValue('rescreened_session_no.value') == ""  || getValue('rescreened_session_no.value') == null)
+		{
+			getField('rescreened_session_no.error').html('This field can not be empty').show();
+			valid=false;
+		}
+		else if(!(rescreened_session_no.match(/^\d+$/))){
+			getField('rescreened_session_no.error').html('Not an integer').show();
+			valid=false;
+        }
+        else if( rescreened_session_no &lt; 1  ){
+	        getField('rescreened_session_no.error').html('Cannot be less than 1').show();
+			valid=false;	
+		}
+        else if( rescreened_session_no &gt; 99 ){
+	        getField('rescreened_session_no.error').html('Cannot be greater than 99').show();
+			valid=false;	
+		}		
+	
+     getField("akuads_severity.value").prop('disabled',false);
+    if(index==0) {
+		alert("Severity cannot be empty. Please recheck to ensure that all fields have been entered correctly");
+                getField("akuads_severity.value").prop('disabled',true);
+		return false;
+	}
+	
+	if(valid==false){
+				return false;
+            }
+    else {
+	            getField("preferred_location.value").prop('disabled',false);
+				var endDate = new Date();
+                var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+				var diffSec = timeDiff/1000;
+				
+                return true;
+    } 
+	
+});
+</script>
+
+
+           <!--<table class="baseline-aligned">
+          <tr>
+                 <td><obs id="date_start" conceptId="164645" labelText="Form Entry Start Date/Time" /></td>
+         </tr>
+         </table>-->
+	<h2>Assesment Form Mental Health</h2>
+
+	<section headerLabel="Encounter Details">
+		<table class="baseline-aligned">
+			<tr>
+				<td>Date:</td>
+				<td><encounterDate id="encounter_date" default="now" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Location:</td>
+				<td><encounterLocation id="encounter_location" default="2" tags="PMDT" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Provider:</td>
+				<td><encounterProvider id="encounter_provider" default="currentUser" type="autocomplete" required="true" /></td>
+			</tr>			
+		</table>
+		
+		<table class="baseline-aligned">
+		  <tr>
+                <td><obs id="followup_visit_type" conceptId="165593" defaultValue="165966" answerConceptIds="165966,165968,165969,165967,165964,165965,165037" answerLabels="Reassessment,Relapse/Change in TB Category,End of Treatment-TB,Relapse-Mental Health,Patient Feels Better,Patient Feels Worse,Other" labelText="Type of rescreening:" required="true">
+				 <controls>
+			           <when value="165037" thenDisplay="#other_assesment_reason"/>
+				</controls>
+			    </obs> 
+				</td>
+            </tr>
+			<tr>
+                <td><obs id="other_assesment_reason" conceptId="165037" labelText="Other assesment reason:" required="false"/></td>
+            </tr>
+			<tr>
+                <td><obs id="rescreened_session_no" conceptId="165972" maxlength="2" size="2" labelText="Rescreened at session number:" required="true"/></td>
+            </tr>
+		</table>
+	</section>
+	
+	<section headerLabel="Mental Health Screening - AKUADS">
+		<table class="baseline-aligned">
+                         
+						<tr>
+                             <td><obs id="akuads_sleep" conceptId="164555" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you been sleeping less?" required="true"  /></td>
+                         </tr>
+                         <tr>
+                             <td><obs id="akuads_interest_loss" conceptId="164557" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had lack of interest in your daily activities?" required="true" /></td>
+                         </tr>
+                         <tr>
+                             <td><obs id="akuads_hobby_interest_loss" conceptId="164560" defaultValue="1090" answerConceptIds="1090,1385,1804,1358"  labelText="Have you lost interest in your hobbies?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_anxious" conceptId="164561" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you been anxious?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_doom_sensation" conceptId="164562" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had a sensation of impending doom?"  required="true" /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_difficulty_thinking" conceptId="164563" defaultValue="1090" answerConceptIds="1090,1385,1804,1358"  labelText="Have you had difficulty in thinking clearly?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_alone" conceptId="164564" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you preferred to be alone?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_unhappy" conceptId="164565" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt unhappy?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_hopeless" conceptId="164566" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt hopeless?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_helpless" conceptId="164567" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt helpless?" required="true"  /></td>
+                         </tr>
+                           <tr>
+                             <td><obs id="akuads_worried" conceptId="164568" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you been worried?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs  id="akuads_cried" conceptId="164569" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you cried?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_suicidal" conceptId="164571" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you thought of taking your life?" required="true"  /></td>
+                         </tr>
+                            <tr>
+                             <td><obs id="akuads_appetite_loss" conceptId="164572" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had loss of appetite?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_retrosternal_burning" conceptId="164573" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had retrosternal burning?" required="true"  /></td>
+                         </tr>
+                         <tr>
+                             <td><obs id="akuads_indigestion" conceptId="164574" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had indigestion?" required="true"  /></td>
+                         </tr>
+                          <tr>
+                             <td><obs id="akuads_nausea" conceptId="164575" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had nausea?" required="true"  /></td>
+                         </tr>
+                         <tr>
+                             <td><obs id="akuads_constipation" conceptId="164576" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had constipation?" required="true"  /></td>
+                         </tr>
+                         <tr>
+                             <td><obs id="akuads_breathing_difficulty" conceptId="164577" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt difficulty in breathing?" required="true"  /></td>
+                        </tr>
+                         <tr>
+                             <td><obs id="akuads_tremulous" conceptId="164578" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt tremulous?"  required="true" /></td>
+                        </tr>
+                         <tr>
+                             <td><obs  id="akuads_numbness" conceptId="164579" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt numbness of hands and feet?" required="true"  /></td>
+                        </tr>
+                          <tr>
+                             <td><obs id="akuads_tension" conceptId="164581" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt a sensation of tension in your neck and shoulders?" required="true"  /></td>
+                        </tr>
+                         <tr>
+                             <td><obs id="akuads_headaches" conceptId="164582" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you had headaches?" required="true"  /></td>
+                        </tr>
+                        <tr>
+                             <td><obs id="akuads_body_pain" conceptId="164584" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you felt pain all over your body?"  required="true" /></td>
+                        </tr>
+                         <tr>
+                             <td><obs id="akuads_frequent_urination" conceptId="164585" defaultValue="1090" answerConceptIds="1090,1385,1804,1358" labelText="Have you passed urine more frequently?" required="true"  /></td>
+                        </tr>
+                        <tr>
+                             <td><obs id="akuads_score" conceptId="164586"  labelText="AKUADS score" required="false"  /></td>
+                        </tr>
+                         <tr>
+                             <td><obs id="akuads_severity" conceptId="164588" answerConceptIds="1115,1498,1499,1500" labelText="Severity level"  required="false" /></td>
+                        </tr>
+						<tr>
+                             <td><obs id="continuation_status" conceptId="165184" defaultValue = "151321" answerConceptIds="151321,165183,1648,165684" answerLabels="Continue therapy,Last session,Referred,Other" labelText="Continuation Status:"  required="true" >
+							 </obs>
+							 </td>
+                        </tr>
+                        <tr>
+                             <td>
+							 <obs id="therapy_consent" conceptId="164589" defaultValue = "1065" answerConceptIds="1065,1066" labelText="Does the client agree to therapy?"   >
+			                 </obs>
+							 </td>							 
+                        </tr>
+						<tr> 
+                             <td>
+							 <obs id="treatment_facility_counselling_consent" conceptId="165844"  answerConceptIds="1065,1066" labelText="Do you want to be counselled at the treatment facility?"  required="false" >
+			                 </obs>
+							 </td>							 
+                        </tr>
+						<tr>
+                             <td>
+							 <obs id="phone_counselling_consent" conceptId="165841" answerConceptIds="1099,1098,165590,1107" labelText="Do you want to be counselled on phone?"  required="false" >
+							 </obs>
+							 </td>							 
+                        </tr>
+						<tr>
+                             <td>
+							 <p id="preferred_location1">
+							 Preferred location for Therapy
+							 <select id="facility_list">			   
+				             </select>
+							 <obs id="preferred_location" conceptId="164363" required="false" />
+							 </p>
+							 </td>
+                        </tr>
+						<tr>
+                             <td><obs conceptId="5096" id="return_visit_date" labelText="Next Appointment Date:" allowFutureDates="true" required="false"/></td>
+                        </tr>
+                                              
+              </table>
+       </section>
+       <submit/>
+</htmlform>

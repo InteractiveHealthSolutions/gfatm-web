@@ -1,0 +1,727 @@
+<htmlform>
+     <!-- Developed  by Ali -->
+    <macros>
+		paperFormId = (Fill this in)
+		headerColor =#009d8e
+		fontOnHeaderColor = white
+	</macros>
+	
+	<style>
+		.section {
+			border: 1px solid $headerColor;
+			padding: 2px;
+			text-align: left;
+			margin-bottom: 1em;
+		}
+		.sectionHeader {
+			background-color: $headerColor;
+			color: $fontOnHeaderColor;
+			display: block;
+			padding: 2px;
+			font-weight: bold;
+		}
+		table.baseline-aligned td {
+			vertical-align: baseline;
+		}
+	</style>
+	
+	<script type="text/javascript">
+	
+	       var startDate = new Date();
+		   var mode = 1;
+           if(jQuery){
+
+                     jQuery(document).ready(function(){
+							
+						function toggleNewDrugs() {
+							var eValue = getField("eligible_new_drugs.value").val();
+							
+							if(eValue==1065) {
+								 $j("#new_drugs").show();
+								 if(mode==1)
+									getField("consent_study.value").prop('selectedIndex',0);
+							}
+							
+							else {
+								$j("#new_drugs").hide();
+								if(mode==1)
+									getField("consent_study.value").prop('selectedIndex',4);
+							}
+
+						}
+						
+						function toggleEDD() {
+							var pValue = getField("pregannt_treatment_start.value").val();
+							
+							if(pValue==1065) {
+								 $j("#edd").show();
+								 
+							}
+							
+							else {
+								$j("#edd").hide();
+								if(mode==1)
+									setValue("date_delivery_preg.value","");
+							}
+						}
+						
+						function toggleTxStart() {
+							var txValue = getField("treatment_start.value").val();
+							
+							if(txValue==1065) {
+								 $j("#tx_start").show();
+								 $j("#tx_not_start").hide();
+								 
+					
+								if(mode==1) {
+								getField("pregannt_treatment_start.value").prop('selectedIndex',2);
+								getField("breastfeed_treatment_start.value").prop('selectedIndex',2);
+								getField("regimen_same_committee.value").prop('selectedIndex',1);
+								getField("smear_order.value").prop('selectedIndex',2);
+								getField("culture_order.value").prop('selectedIndex',2);
+								getField("dst_order.value").prop('selectedIndex',2);
+								setValue("date_next_assessment.value","");
+								getField("reason_next_assessment.value").prop('selectedIndex',1);
+								getField("reason_treatment_not_initiated.value").prop('selectedIndex',0);
+								
+								}
+								
+								toggleEDD();
+								toggleSameRegimen();
+								toggleOtherDrug();
+								toggleOtherNextAssessmentReason();
+								toggleNoTxReason();
+								
+								
+								
+								
+								
+								
+								 
+							}
+							
+							else {
+								$j("#tx_start").hide();
+								$j("#tx_not_start").show();
+								
+								if(mode==1) {
+								setValue("treatment_start_date.value","");
+								setNextAssessmentDate();
+								document.getElementById("facility_list").selectedIndex=0;
+								setValue("facility_treatment.value","");
+								setValue("facility_treatment_other.value","");
+								setValue("national_reg_number.value","");
+								getField("pregannt_treatment_start.value").prop('selectedIndex',0);
+								
+								getField("breastfeed_treatment_start.value").prop('selectedIndex',0);
+								getField("regimen_same_committee.value").prop('selectedIndex',0);
+								
+								getField("smear_order.value").prop('selectedIndex',0);
+								getField("culture_order.value").prop('selectedIndex',0);
+								getField("dst_order.value").prop('selectedIndex',0);
+								setValue("date_next_assessment.value","");
+								getField("reason_next_assessment.value").prop('selectedIndex',0);
+								getField("reason_treatment_not_initiated.value").prop('selectedIndex',7);
+								}
+								
+								toggleEDD();
+								toggleSameRegimen();
+								toggleOtherDrug();
+								toggleOtherNextAssessmentReason();
+								toggleNoTxReason();
+								
+								
+								
+								
+							}
+
+						}
+						
+						function toggleOtherFacility() {
+							if(getValue('facility_treatment.value')=='OTHER'){
+								$j('#other_facility').show();
+							}
+							else {
+								$j('#other_facility').hide();
+								if(mode==1)
+									setValue("facility_treatment_other.value","");
+							}
+						}
+						
+						function toggleSameRegimen() {
+							var regValue = getField('regimen_same_committee.value').val();
+							
+							if(regValue==1066){
+								$j('#tb_regimen').show();
+								if(mode==1)
+									getField("Isoniazid.value").prop('checked',true);
+							}
+							else {
+								$j('#tb_regimen').hide();
+								
+								if(mode==1) {
+								getField("Isoniazid.value").prop('checked',false);
+								getField("Rifampicin.value").prop('checked',false);
+								getField("Ethambutol.value").prop('checked',false);
+								getField("Pyrazinamide.value").prop('checked',false);
+								getField("Streptomycin.value").prop('checked',false);
+								getField("Amikacin.value").prop('checked',false);
+								getField("Kanamycin.value").prop('checked',false);
+								getField("Capreomycin.value").prop('checked',false);
+								getField("Levofloxacin.value").prop('checked',false);
+								getField("Moxifloxacin.value").prop('checked',false);
+								getField("Ofloxacin.value").prop('checked',false);
+								getField("Gatifloxacin.value").prop('checked',false);
+								getField("Prothionamide.value").prop('checked',false);
+								getField("Ethionamide.value").prop('checked',false);
+								getField("Cycloserine.value").prop('checked',false);
+								getField("Terizidone.value").prop('checked',false);
+								getField("PAS.value").prop('checked',false);
+								getField("PAS-Na.value").prop('checked',false);
+								getField("Bedaquiline.value").prop('checked',false);
+								getField("Delamanid.value").prop('checked',false);
+								getField("Linezolid.value").prop('checked',false);
+								getField("Clofazimine.value").prop('checked',false);
+								getField("Imipenem and cilastatin.value").prop('checked',false);
+								getField("Amoxicillin-clavulanate.value").prop('checked',false);			
+								getField("Meropenem.value").prop('checked',false);
+								getField("Clarithromycin.value").prop('checked',false);
+								getField("Thioacetazone.value").prop('checked',false);
+								getField("Other.value").prop('checked',false);
+								setValue("tb_regimen_other.value","");
+								setValue("regimen_not_same_reason.value","");
+								}
+								
+
+							}
+						}
+						
+						function toggleOtherDrug() {
+							if(getField("Other.value").prop('checked')==true) {
+								$j('#other_regimen').show();
+							}
+							
+							else {
+								$j('#other_regimen').hide();
+								if(mode==1)
+									setValue("tb_regimen_other.value","");
+							}
+							
+							
+						}
+						
+						function toggleOtherNextAssessmentReason() {
+							var naValue = getField("reason_next_assessment.value").val();
+							
+							if(naValue==165036) {
+								$j('#other_next_assessment_reason').show();
+							}
+							
+							else {
+								$j('#other_next_assessment_reason').hide();
+								if(mode==1)
+									setValue("reason_next_assessment_other.value","");
+							}
+							
+							
+						}
+						
+						function toggleNoTxReason() {
+							var ntxValue = getField("reason_treatment_not_initiated.value").val();
+							
+							if(ntxValue==164649) {
+								$j('#other_not_start_reason').show();
+								$j('#date_of_death').hide();
+								if(mode==1)
+									setValue("date_death.value","");
+							}
+							
+							else if(ntxValue==160034){
+								$j('#other_not_start_reason').hide();
+								$j('#date_of_death').show();
+								if(mode==1)
+									setValue("reason_treatment_not_initiated_other.value","");
+							}
+							
+							else {
+								$j('#other_not_start_reason').hide();
+								$j('#date_of_death').hide();
+								
+								if(mode==1) {
+								setValue("reason_treatment_not_initiated_other.value","");
+								setValue("date_death.value","");
+								}
+							}
+							
+							
+						}
+						//yyyy-mm-dd
+						
+						function setNextAssessmentDate() {
+							
+							var txDate = getValue("treatment_start_date.value");
+							
+							if(txDate == "")
+								return "";
+								
+							var parts = txDate.split('-');
+							var mydate = new Date(parts[0],parts[1]-1,parts[2]); 
+							
+							mydate.setDate(mydate.getDate() + 13);
+							
+							
+							var year = mydate.getFullYear();
+							var month = mydate.getMonth() + 1;
+							if(month &lt; 10) {
+								month = 0 + "" + month;
+							}
+							var dt = mydate.getDate();
+							if(dt &lt; 10) {
+								dt = 0 + "" + dt;
+							}
+							var nextDate = year + "-" + month + "-" + dt;
+							
+							setValue("date_next_assessment.value",nextDate);
+
+						}
+							
+							
+						 getField("time_taken.value").prop('readonly',true);
+						 
+						 <ifMode mode="ENTER">
+						 $j("#new_drugs").hide();
+						 $j("#edd").hide();
+						 $j("#tx_start").show();
+						 $j("#tx_not_start").hide();
+						 $j('#other_facility').hide();
+						 $j('#other_regimen').hide();
+						 $j('#other_next_assessment_reason').hide();
+						 $j('#other_not_start_reason').hide();
+						 $j('#date_of_death').hide();
+						  </ifMode>
+						
+						 doRest();
+						 
+						 
+						 <ifMode mode="ENTER">
+						 mode = 1;
+						 </ifMode>
+						 
+						  <ifMode mode="EDIT">
+						  mode = 0;
+						  </ifMode>
+						  
+						 <ifMode mode="VIEW" include="false">
+						 toggleNewDrugs();
+						 toggleEDD();
+						 toggleTxStart();
+						 toggleOtherFacility();
+						 toggleOtherDrug();
+						 toggleSameRegimen();
+						 toggleOtherNextAssessmentReason();
+						 toggleNoTxReason();
+						 </ifMode>
+						 
+						  <ifMode mode="EDIT">
+						  mode = 1;
+						  </ifMode>
+					
+						 getField("treatment_start_date.value").change(setNextAssessmentDate);
+						 getField("eligible_new_drugs.value").change(toggleNewDrugs);
+						 getField("pregannt_treatment_start.value").change(toggleEDD);
+						 getField("treatment_start.value").change(toggleTxStart);
+						 getField("facility_treatment.value").change(toggleOtherFacility);
+						 getField("Other.value").change(toggleOtherDrug);
+						 getField("regimen_same_committee.value").change(toggleSameRegimen);
+						 getField("reason_next_assessment.value").change(toggleOtherNextAssessmentReason);
+						 getField("reason_treatment_not_initiated.value").change(toggleNoTxReason);
+						 
+                     });
+					 
+					 function doRest(){
+						jQuery.ajax({
+							url: "/openmrs/ws/rest/v1/location?v=custom:(uuid,display,name,description)&amp;tag=PMDT",
+							dataType: 'json'
+						}).done(function(data ) {
+							console.log(data.results[0].name);
+							console.log(data.results.length);
+							locationData = data;
+							populate(data);
+							
+							
+					});
+				}
+				
+				function populate(data) {
+								
+					var s= document.getElementById('facility_list');
+					var facVal = getField("facility_treatment.value").val();
+					
+					for (i = 0; i &lt; data.results.length; i++) {
+						if(facVal!="") {
+							if(facVal == data.results[i].name) {
+								s.options[i+1]= new Option(data.results[i].description, data.results[i].name, false, true); 
+							}
+							
+							else {
+								s.options[i+1]= new Option(data.results[i].description, data.results[i].name);
+							}
+						}
+						
+						else {
+							s.options[i+1]= new Option(data.results[i].description, data.results[i].name);                      
+						}
+						var resultObject =  JSON.parse(JSON.stringify(data.results[i].description || null));
+					}
+					
+					
+				}
+		
+
+           
+		   
+		   jQuery(function() { 
+			var facilities = document.getElementById("facility_list");
+			facilities.onchange = function(){
+                var e = document.getElementById("facility_list");
+				var locationDescription = e.options[e.selectedIndex].text;
+                var locationName = e.options[e.selectedIndex].value;
+			
+				setValue('facility_treatment.value',locationName );
+				getField('facility_treatment.value').change();
+										
+		}
+		});
+					 
+				 
+					 
+
+           }
+		   
+		    beforeSubmit.push(function() {
+			
+				var valid = true;
+				
+				if(getField("eligible_new_drugs.value").prop('selectedIndex')==0) {
+					alert("You must select an option for new drugs eligibility");
+					valid = false;
+				}
+				
+				else if(getField("eligible_new_drugs.value").prop('selectedIndex')==1 &amp;&amp; getField("date_eligible_new_drugs.value").val()=="") {
+					alert("You must select the date when patient became eligible for new drugs");
+					valid = false;
+				}
+				
+				else if(getField("eligible_new_drugs.value").prop('selectedIndex')==1 &amp;&amp; getField("XDR.value").prop('checked')==false &amp;&amp; getField("Pre-XDR - fluoroquinolone.value").prop('checked')==false &amp;&amp; getField("Pre-XDR - injectable.value").prop('checked')==false &amp;&amp; getField("Other resistance but not XDR or pre-XDR.value").prop('checked')==false &amp;&amp; getField("Contact with a patient with above strain.value").prop('checked')==false &amp;&amp; getField("Unable to tolerate MDR drugs.value").prop('checked')==false &amp;&amp; getField("Failed MDR regimen.value").prop('checked')==false) {
+					alert("You must choose an indication for new drugs for patients for whom the construction of a regimen with four likely effective second-line drugs is not possible");
+					valid = false;
+				}
+				
+				else if(getField("treatment_start.value").prop('selectedIndex')==1) {
+					if(getField("treatment_start_date.value").val()=="") {
+						alert("You must enter a treatment start date");
+						valid = false;
+					}
+					
+					else if(getField("facility_treatment.value").val()=="") {
+						alert("You must select a treatment facility");
+						valid = false;
+					}
+					
+					else if(getField("facility_treatment.value").val()=="OTHER" &amp;&amp; getField("facility_treatment_other.value").val()=="") {
+						alert("You must specify the other treatment facility");
+						valid = false;
+					}
+					
+					else if(getField("pregannt_treatment_start.value").prop('selectedIndex')==0) {
+						alert("You must select an option for pregnancy of patient or partner");
+						valid = false;
+					}
+				
+					else if(getField("pregannt_treatment_start.value").prop('selectedIndex')==1 &amp;&amp; getField("date_delivery_preg.value").val()=="") {
+						alert("You must select the date when for estimated date of delivery for patient or partner");
+						valid = false;
+					}
+					
+					else if(getField("breastfeed_treatment_start.value").prop('selectedIndex')==0) {
+						alert("You must select an option for whether patient or partner is breastfeeding");
+						valid = false;
+					}
+					
+					else if(getField("regimen_same_committee.value").prop('selectedIndex')==0) {
+						alert("You must select an option for whether the regimen is that same the one recommended by medical committee");
+						valid = false;
+					}
+					
+					else if(getField("regimen_same_committee.value").prop('selectedIndex')==2) {
+						
+						if(getField("Isoniazid.value").prop('checked')==false &amp;&amp; getField("Rifampicin.value").prop('checked')==false &amp;&amp; getField("Ethambutol.value").prop('checked')==false &amp;&amp; getField("Pyrazinamide.value").prop('checked')==false &amp;&amp; getField("Streptomycin.value").prop('checked')==false &amp;&amp; getField("Amikacin.value").prop('checked')==false &amp;&amp; getField("Kanamycin.value").prop('checked')==false &amp;&amp; getField("Capreomycin.value").prop('checked')==false &amp;&amp; getField("Levofloxacin.value").prop('checked')==false &amp;&amp; getField("Moxifloxacin.value").prop('checked')==false &amp;&amp; getField("Ofloxacin.value").prop('checked')==false &amp;&amp; getField("Gatifloxacin.value").prop('checked')==false &amp;&amp; getField("Prothionamide.value").prop('checked')==false &amp;&amp; getField("Ethionamide.value").prop('checked')==false &amp;&amp; getField("Cycloserine.value").prop('checked')==false &amp;&amp; getField("Terizidone.value").prop('checked')==false &amp;&amp; getField("PAS.value").prop('checked')==false &amp;&amp; getField("PAS-Na.value").prop('checked')==false &amp;&amp; getField("Bedaquiline.value").prop('checked')==false &amp;&amp; getField("Delamanid.value").prop('checked')==false &amp;&amp; getField("Linezolid.value").prop('checked')==false &amp;&amp; getField("Clofazimine.value").prop('checked')==false &amp;&amp; getField("Imipenem and cilastatin.value").prop('checked')==false &amp;&amp; getField("Amoxicillin-clavulanate.value").prop('checked')==false &amp;&amp; getField("Meropenem.value").prop('checked')==false &amp;&amp; getField("Clarithromycin.value").prop('checked')==false &amp;&amp; getField("Thioacetazone.value").prop('checked')==false &amp;&amp; getField("Other.value").prop('checked')==false) {
+							alert("You must select at least one drug for the patient's regimen");
+							valid = false;
+						}
+
+						else if(getField("Other.value").prop('checked')==true &amp;&amp; getField("tb_regimen_other.value").val()=="") {
+							alert("You must specify the 'Other' TB drug that has been prescribed to the patient");
+							valid = false;
+						}
+						
+						else if(getField("regimen_not_same_reason.value").val()=="") {
+							alert("Please enter a reason why the treatment was started with regimen different from that prescribed by Medical Committee");
+							valid = false;
+						}
+					}
+					
+					else if(getField("smear_order.value").prop('selectedIndex')==0) {
+						alert("You must select an option for whether a smear was ordered");
+						valid = false;
+					}
+					
+					else if(getField("culture_order.value").prop('selectedIndex')==0) {
+						alert("You must select an option for whether a culture was ordered");
+						valid = false;
+					}
+					
+					else if(getField("dst_order.value").prop('selectedIndex')==0) {
+						alert("You must select an option for whether a DST was ordered");
+						valid = false;
+					}
+					
+					else if(getField("date_next_assessment.value").val()=="") {
+						alert("You must select a date for the next assessment");
+						valid = false;
+					}
+					
+					else if(getField("reason_next_assessment.value").prop('selectedIndex')==0) {
+						alert("You must select a reason for the next assessment");
+						valid = false;
+					}
+					
+					else if(getField("reason_next_assessment.value").prop('selectedIndex')==3 &amp;&amp; getField("reason_next_assessment_other.value").val()=="") {
+						alert("You must specify the 'Other' reason for the next assessment");
+						valid = false;
+					}
+	
+				}
+				
+				else if(getField("treatment_start.value").prop('selectedIndex')==2) {
+					
+					if(getField("reason_treatment_not_initiated.value").prop('selectedIndex')==0) {
+						alert("You must select why treatment was not initiated");
+						valid = false;
+					}
+					
+					else if(getField("reason_treatment_not_initiated.value").prop('selectedIndex')==3 &amp;&amp; getField("date_death.value").val()=="") {
+						alert("Please specify the date of patient's death");
+						valid = false;
+					}
+					
+					else if(getField("reason_treatment_not_initiated.value").prop('selectedIndex')==7 &amp;&amp; getField("reason_treatment_not_initiated_other.value").val()=="") {
+						alert("Please specify the 'Other' reason why treatment was not initated");
+						valid = false;
+					}
+				}
+
+				
+				
+				<ifMode mode="ENTER">
+				if(valid==true) {
+					
+					var endDate = new Date();
+					var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+					var diffSec = timeDiff/1000;
+					setValue("time_taken.value",diffSec);
+				}
+				</ifMode>
+	
+				
+				
+				return valid;
+            });
+	
+	
+	</script>
+   
+    <h2>PMDT-Treatment Initiation</h2>
+
+	<section>
+		<table class="baseline-aligned">
+			<tr>
+				<td>Date:</td>
+				<td><encounterDate id="encounter_date" default="today" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Location:</td>
+				<td><encounterLocation id="encounter_location" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Provider:</td>
+				<td><encounterProvider id="encounter_provider" required="true" /></td>
+			</tr>
+		</table>
+	</section>
+	
+	<section>
+	    <table class="baseline-aligned">
+			<tr>
+				<td><obs id="eligible_new_drugs" conceptId="164643" labelText="Is the patient eligible for treatment with new drugs?" required="true" defaultValue="1065" answerConceptIds="1065,1066,1067" answerLabels="Yes,No,Unknown" /></td>
+			</tr>
+		</table>
+		<div id="new_drugs">
+		<table class="baseline-aligned">
+			<tr>
+				<td><obs id="date_eligible_new_drugs" conceptId="164644" labelText="On what date was the patient determined to be eligible for new drugs?" required="false" allowTime="false" /></td>
+			</tr>
+			<tr>
+				<td>Indication for new TB drugs: 1) Patients for whom the construction of a regimen with four likely effective second-line drugs is not possible:<br/>
+				    <obsgroup groupingConceptId="164908">
+					<obs conceptId="164908" id="XDR" answerConceptId= "159346" answerLabel="XDR" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Pre-XDR - fluoroquinolone" answerConceptId= "165701" answerLabel="Pre-XDR - fluoroquinolone" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Pre-XDR - injectable" answerConceptId= "165702" answerLabel="Pre-XDR - injectable" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Other resistance but not XDR or pre-XDR" answerConceptId= "164904" answerLabel="Other resistance but not XDR or pre-XDR" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Contact with a patient with above strain" answerConceptId= "164905" answerLabel="Contact with a patient with above strain" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Unable to tolerate MDR drugs" answerConceptId= "164906" answerLabel="Unable to tolerate MDR drugs" style="checkbox" /><br/>
+					<obs conceptId="164908" id="Failed MDR regimen" answerConceptId= "164907" answerLabel="failed MDR regimen" style="checkbox" /><br/>
+					</obsgroup>
+				</td>
+					
+			</tr>
+			<tr>
+				<td>Indication for new TB drugs: 2) Other patients who have high risk of unfavorable outcome but who do not fit the above categories:<br/>
+					<obsgroup groupingConceptId="164912">
+					<obs conceptId="164912" id="Extensive or advanced disease" answerConceptId= "164909" answerLabel="Extensive or advanced disease" style="checkbox" /><br/>
+					<obs conceptId="164912" id="Comorbidity/low BMI/HIV/ diabetes" answerConceptId= "164910" answerLabel="Comorbidity/low BMI/HIV/ diabetes" style="checkbox" /><br/>
+					<obs conceptId="164912" id="From areas with poor MDR-TB outcomes " answerConceptId= "164911" answerLabel="From areas with poor MDR-TB outcomes " style="checkbox" /><br/>
+					</obsgroup>
+				</td>	
+			</tr>
+		</table>
+		</div>
+		<table class="basline-aligned">
+			<tr>
+				<td><obs id="consent_treatment" conceptId="164917" labelText="Has the Treatment consent form been explained and signed?" required="true" defaultValue="1065" answerConceptIds="1065,1066,1067" answerLabels="Yes,No,Unknown" /></td>
+			</tr>
+			<tr>
+				<td><obs id="consent_study" conceptId="164919" labelText="Has the endTB Observational Study Consent Form been explained and signed?" required="false" answerConceptIds="1065,1066,162866,164918" answerLabels="Yes,No,Pending,Not Possible" /></td>
+			</tr>
+			<tr>
+				<td><obs id="treatment_start" conceptId="164924" labelText="Did the patient start treatment?" required="true" answerConceptIds="1065,1066" answerLabels="Yes,No" defaultValue="1065"/></td>
+			</tr>
+			
+		</table>
+		<div id="tx_start">
+		<table class="baseline-aligned">
+			<tr>
+				<td><obs id="treatment_start_date" conceptId="163526" labelText="Provide treatment start date?" required="false" allowTime="false" /></td>
+			</tr>
+			<tr>
+				<td> in which facility did they start their treatment? <select id="facility_list" > </select> <obs id="facility_treatment" conceptId="162724" required="false" /></td>
+			</tr>
+			<tr>
+				<td><div id="other_facility">If treatment facility 'other', then specify: <obs conceptId="165695" id="facility_treatment_other" maxlength="50"/></div></td>
+			</tr>
+			<tr>
+				<td><obs id="national_reg_number" conceptId="164925" labelText="Provide National DR TB Registration number" required="false" maxlength="25" /></td>
+			</tr>
+			<tr>
+				<td><obs id="pregannt_treatment_start" conceptId="164921" labelText="Is the patient (if female) or the patient's (if male) partner pregnant at the time of starting treatment?" required="false" answerConceptIds="1065,1066,1067,1175"  answerLabels="Yes,No,Unknown,Not Applicable" /></td>
+			</tr>
+			<tr>
+				<td><div id="edd"><obs id="date_delivery_preg" conceptId="5596" labelText="Estimated date of delivery:" required="false" allowTime="false" /></div></td>
+			</tr>
+			<tr>
+				<td><obs id="breastfeed_treatment_start" conceptId="164923" labelText="Is the patient (if female) or the patient's (if male) partner breastfeeding at the time of starting treatment?" required="false" answerConceptIds="1065,1066,1067,1175"  answerLabels="Yes,No,Unknown,Not Applicable" /></td>
+			</tr>
+			<tr>
+			     <td><obs id="regimen_same_committee" conceptId="164926" labelText="Is the treatment regimen same as decided by the medical review committee?" required="false" answerConceptIds="1065,1066" answerLabels="Yes,No" /></td>
+			</tr>
+			
+			<tr><td>
+			<div id="tb_regimen">
+			TB drug regimen decided<br/>
+			    <obsgroup groupingConceptId="160021">
+					<obs conceptId="160021" id="Isoniazid" answerConceptId= "78280" answerLabel="Isoniazid" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Rifampicin" answerConceptId= "767" answerLabel="Rifampicin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Ethambutol" answerConceptId= "75948" answerLabel="Ethambutol" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Pyrazinamide" answerConceptId= "82900" answerLabel="Pyrazinamide" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Streptomycin" answerConceptId= "84360" answerLabel="Streptomycin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Amikacin" answerConceptId= "71060" answerLabel="Amikacin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Kanamycin" answerConceptId= "78385" answerLabel="Kanamycin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Capreomycin" answerConceptId= "72794" answerLabel="Capreomycin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Levofloxacin" answerConceptId= "78788" answerLabel="Levofloxacin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Moxifloxacin" answerConceptId= "80133" answerLabel="Moxifloxacin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Ofloxacin" answerConceptId= "81022" answerLabel="Ofloxacin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Gatifloxacin" answerConceptId= "76835" answerLabel="Gatifloxacin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Prothionamide" answerConceptId= "82772" answerLabel="Prothionamide" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Ethionamide" answerConceptId= "75976" answerLabel="Ethionamide" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Cycloserine" answerConceptId= "74123" answerLabel="Cycloserine" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Terizidone" answerConceptId= "84836" answerLabel="Terizidone" style="checkbox" /><br/>
+					<obs conceptId="160021" id="PAS" answerConceptId= "81457" answerLabel="PAS" style="checkbox" /><br/>
+					<obs conceptId="160021" id="PAS-Na" answerConceptId= "164640" answerLabel="PAS-Na" style=" checkbox" /><br/>
+					<obs conceptId="160021" id="Bedaquiline" answerConceptId= "163143" answerLabel="Bedaquiline" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Delamanid" answerConceptId= "163144" answerLabel="Delamanid" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Linezolid" answerConceptId= "78879" answerLabel="Linezolid" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Clofazimine" answerConceptId= "73581" answerLabel="Clofazimine" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Imipenem and cilastatin" answerConceptId= "104315" answerLabel="Imipenem and cilastatin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Amoxicillin-clavulanate" answerConceptId= "450" answerLabel="Amoxicillin-clavulanate" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Meropenem" answerConceptId= "79611" answerLabel="Meropenem" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Clarithromycin" answerConceptId= "73498" answerLabel="Clarithromycin" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Thioacetazone" answerConceptId= "160019" answerLabel="Thioacetazone" style="checkbox" /><br/>
+					<obs conceptId="160021" id="Other" answerConceptId= "164805" answerLabel="Other" style="checkbox" /><br/>
+				</obsgroup>	
+				<div id="other_regimen">
+					<obs id="tb_regimen_other" conceptId="164805" maxlength="100" required="false" labelText="Other TB drug to be included in the regimen"/><br/>
+				</div>
+				<obs id="regimen_not_same_reason" conceptId="164927" labelText="If not same as that decided by the medical review committee, provide the reason:" required="false" maxlength="255" /><br/>
+			
+				
+			</div>
+			</td></tr>
+			
+			<tr>
+				<td><obs id="smear_order" conceptId="164930" labelText="Smear test ordered at this visit?" required="false" answerConceptIds="1065,1066" answerLabels="Yes,No"  /></td>
+			</tr>
+			<tr>
+				<td><obs id="culture_order" conceptId="165031" labelText="Culture test ordered at this visit?" required="false" answerConceptIds="1065,1066" answerLabels="Yes,No"  /></td>
+			</tr>
+			<tr>
+				<td><obs id="dst_order" conceptId="165032" labelText="DST test ordered at this visit?" required="false" answerConceptIds="1065,1066" answerLabels="Yes,No"  /></td>
+			</tr>
+			<tr>
+				<td><obs id="date_next_assessment" conceptId="165033" labelText="Next assessment date:" required="false" allowTime="false" allowFutureDates="true" /></td>
+			</tr>
+			<tr>
+				<td><obs id="reason_next_assessment" conceptId="165034" labelText="Reason for next assessment" required="false" answerConceptIds="165039,165040,165036,165041,165042"  answerLabels="2 week assessment,Planned monthly assessment,Other assessment,End of treatment assessment,Post-treatment assessment" /></td>
+			</tr>
+			<tr>
+				<td><div id="other_next_assessment_reason"><obs id="reason_next_assessment_other" conceptId="165037" labelText="Other assessment reason" required="false" maxlength="100" /></div></td>
+			</tr>
+		</table>
+
+		</div>
+		
+		
+		
+		<div id="tx_not_start">
+			<table class="baseline-aligned">
+				<tr>
+					<td><obs id="reason_treatment_not_initiated" conceptId="164437" labelText="Reason for not starting treatment:" required="false" answerConceptIds="127750,160036,160034,160031,164928,164929,164649" answerLabels="Patient refused,Primary transfer out,Died,Lost to follow-up,Rejected by committee,Referred to other faciltiy,Other"  /></td>
+				</tr>
+				<tr>
+					<td><div id="other_not_start_reason"><obs id="reason_treatment_not_initiated_other" conceptId="164649" labelText="If reason for not starting treatment 'other', then specify:" required="false" maxlength="100" /> </div></td>
+				</tr>
+				<tr>
+					<td><div id="date_of_death"><obs id="date_death" conceptId="1543" labelText="Provide date of death" required="false" allowTime="false" /> </div></td>
+				</tr>
+			</table>
+		</div>
+		<table class="baseline-aligned">
+		<tr>
+				<td><obs id="time_taken" conceptId="165044" labelText = "Time Taken to Fill Form" /></td>
+		</tr>
+		</table>
+		
+	</section>
+	
+	<submit/>
+	
+</htmlform>

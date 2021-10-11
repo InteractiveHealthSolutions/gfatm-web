@@ -1,0 +1,903 @@
+<htmlform>
+    <macros>
+        paperFormId = (Fill this in)
+        headerColor =#009d8e
+        fontOnHeaderColor = white
+    </macros>
+
+    <style>
+        .section {
+            border: 1px solid $headerColor;
+            padding: 2px;
+            text-align: left;
+            margin-bottom: 1em;
+        }
+        .sectionHeader {
+            background-color: $headerColor;
+            color: $fontOnHeaderColor;
+            display: block;
+            padding: 2px;
+            font-weight: bold;
+        }
+        table.baseline-aligned td {
+            vertical-align: baseline;
+        }
+        table.result_available_table td{
+            vertical-align: baseline;
+            padding: 5px;
+        }
+
+    </style>
+
+    <span style="float:right">Paper Form ID: $paperFormId</span>
+    <h2>CC - Diagnostic Test Result Available (v1.1.1)</h2>
+    <section headerLabel="1. Encounter Details">
+        <table class="baseline-aligned">
+            <tr>
+                <td>Date:</td>
+                <td><encounterDate  default="now"/></td>
+            </tr>
+            <tr>
+                <td>Location:</td>
+                <td><encounterLocation default="66"/></td>
+            </tr>
+            <tr>
+                <td>Provider:</td>
+                <td><encounterProvider default="currentUser" type="autocomplete"/></td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- Outbound Available Result Details -->
+    <section headerLabel="1. Outbound Available Result Information">
+        <table class="result_available_table">
+            <tr>
+                <td><p>Test Type</p></td>
+                <td><obs conceptId="165739" answerConceptIds="165359, 164726, 165738" id="test_type"  required="true" defaultValue="165359" >
+                    <controls>
+                        <when value="165359" thenDisplay="#gxp_mt_result_tr"/>
+                        <when value="164726" thenDisplay="#afb_smear_result_tr"/>
+                        <when value="165738" thenDisplay="#bbA1c_result_tr"/>
+                    </controls>
+                </obs>
+                </td>
+            </tr>
+            <tr id="gxp_mt_result_tr">
+                <td><p>GeneXpert MTB Result</p></td>
+                <td><obs conceptId="162202" id= "gxp_result" /></td>
+            </tr>
+            <tr id="afb_smear_result_tr">
+                <td><p>AFB Smear Result</p></td>
+                <td><obs conceptId="307" id= "afb_result" /></td>
+            </tr>
+            <tr id="bbA1c_result_tr">
+                <td><p>HbA1C Result</p></td>
+                <td><obs conceptId="159644" id= "hba_result" /></td>
+            </tr>
+            <tr>
+                <td><p>Have you been able to contact the patient?</p></td>
+                <td><obs conceptId="164468" answerConceptIds="1065, 1066, 165784" id="patient_contacted"  required="true" >
+                    <controls>
+                        <when value="1066" thenDisplay="#reason_patient_not_contacted_tr"/>
+                        <when value="1065" thenDisplay="#facility_visit_date_tr, #facility_scheduled_tr"/>
+                    </controls>
+                </obs>
+                </td>
+            </tr>
+            <tr id="reason_patient_not_contacted_tr">
+                <td><p>If no, why were you unable to contact the patient?</p></td>
+                <td><obs conceptId="164469" id="reason_patient_not_contacted" answerConceptIds="164470,164471,164472,166045,164473" answerLabels="Phone switched off, Patient not responding, Invalid / Incorrect contact number, Wrong Number ,Other">
+                <controls>
+                        <when value="164473" thenDisplay="#reason_patient_not_contacted_other_tr"/>
+                    </controls>
+                </obs>
+                </td>
+            </tr>
+            <tr id="reason_patient_not_contacted_other_tr">
+                <td><p>If other, please specify</p></td>
+                <td><obs conceptId="164473" id= "reason_patient_not_contacted_other" maxlength="250"/></td>
+            </tr>
+            <tr id="result_picked_tr">
+                <td><p>Have you picked up the test result? </p></td>
+                <td><obs conceptId="165740" id= "result_picked" >
+                    <controls>
+                        <when value="1065" thenDisplay="#pickup_facility_tr"/>
+                    </controls>
+                </obs>
+                </td>
+            </tr>
+            <tr id="pickup_facility_tr">
+                <td><p>Result picked up from which facility?</p></td>
+                <td> <p id="preferred_location1">
+                    <select id="list_facility_location"></select>
+                    <obs conceptId="165741" id= "pickup_facility" />
+                </p>
+                </td>
+            </tr>
+            <tr id="treatment_initiated_tr">
+                <td><p>Have you started treatment?</p></td>
+                <td><obs conceptId="164647" id= "treatment_initiated"  answerConceptIds="1065, 1066">
+                    <controls>
+                        <when value="1065" thenDisplay="#list_facility_treatment_location_tr"/>
+                        <when value="1066" thenDisplay="#reason_treatment_not_started_tr"/>
+                    </controls>
+                </obs>
+                </td>
+            </tr>
+            <tr id="list_facility_treatment_location_tr">
+                <td><p>Treatment started at which facility?</p></td>
+                <td> <p id="preferred_location1">
+                    <select id="list_facility_treatment_location"></select>
+                    <obs conceptId="162724" id= "facility_treatment"  />
+                </p>
+                </td>
+            </tr>
+
+            <tr id="reason_treatment_not_started_tr">
+                <td><p>If not, why</p></td>
+                <td><obs conceptId="165742" id = "reason_treatment_not_started"  maxlength="250" /></td>
+            </tr>
+            <tr id="sample_resubmission_tr">
+                <td><p>Resubmit sputum sample</p></td>
+                <td><obs conceptId="165743" id = "sample_resubmission" answerConceptIds="159413, 159417">
+                    <!-- <controls>
+                  <when value="159413" thenDisplay="#facility_scheduled_tr"/>
+                </controls> -->
+                </obs>
+                </td>
+            </tr>
+            <tr id="facility_visit_date_tr">
+                <td><p>Facility Visit Date</p></td>
+                <td><obs conceptId="165744" id= "facility_visit_date" allowFutureDates="true" /></td>
+            </tr>
+            <tr id="facility_scheduled_tr">
+                <td><p>Facility name</p></td>
+                <td> <p id="preferred_location1">
+                    <select id="list_facility_scheduled_location"></select>
+                    <obs conceptId = "165751" id= "facility_scheduled"/>
+                </p>
+                </td>
+            </tr>
+            <tr id="Comments_tr">
+                <td><p>Comments / Remarks</p></td>
+                <td><obs conceptId="165785" id = "cc_comments"  maxlength ="250" /></td>
+            </tr>
+
+        </table>
+    </section>
+
+    <submit/>
+
+    <script type="text/javascript">
+
+        var testTypes = "test_type";
+        var contactPatient = "contact_patient";
+        var reasonPatientNotContacted = "reason_patient_not_contacted";
+        var resultPicked = "result_picked";
+        var treatmentInitiated ="treatment_initiated";
+        var sampleResubmission = "sample_resubmission";
+        var facilityScheduled  = "facility_scheduled";
+        var resultArr= [];
+        //call when document ready
+        if(jQuery){
+
+            $j(document).ready(function(){
+
+                getLocations();
+                var isLocation = true;
+            <ifMode mode="VIEW">
+                var isLocation = false;
+            </ifMode>
+                if(isLocation) {
+                    document.getElementById('list_facility_location').style.display = 'block';
+                    document.getElementById('list_facility_treatment_location').style.display = 'block';
+                    document.getElementById('list_facility_scheduled_location').style.display = 'block';
+
+                }
+                else {
+                    document.getElementById('list_facility_location').style.display = 'none';
+                    document.getElementById('list_facility_treatment_location').style.display = 'none';
+                    document.getElementById('list_facility_scheduled_location').style.display = 'none';
+                }
+
+                getField('facility_scheduled.value').change();
+                getField('pickup_facility.value').change();
+                getField('facility_treatment.value').change();
+
+
+            <ifMode mode="ENTER">
+                    getField("facility_scheduled.value").prop('disabled',true);
+                getField("pickup_facility.value").prop('disabled',true);
+                getField("facility_treatment.value").prop('disabled',true);
+            </ifMode>
+                ///end here
+            });
+        }
+
+        jQuery(window).bind("load", function() {
+            var enterMode=false;
+            var editeMode =false;
+        <ifMode mode="ENTER">
+            enterMode=true;
+        </ifMode>
+            ///
+            <ifMode mode="EDIT">
+            editeMode=true;
+        </ifMode>///
+            if (enterMode ==true || editeMode == true) {
+                hideAndShowFields(testTypes);
+            }
+            getField("gxp_result.value").prop('disabled',true);
+            getField("hba_result.value").prop('disabled',true);
+            getField("afb_result.value").prop('disabled',true);
+
+        });
+
+        //change listener
+        jQuery(function(){
+
+            var testTypeChange = document.getElementById("test_type");
+            testTypeChange.onchange = function(){
+                hideAndShowFields(testTypes);
+
+            };//end
+            var  patientContactedChange = document.getElementById("patient_contacted");
+            patientContactedChange.onchange= function(){
+                hideAndShowFields(contactPatient);
+                console.log("called contactPatient");
+            };
+            var reasonPatientNotContactedChange = document.getElementById("reason_patient_not_contacted");
+            reasonPatientNotContactedChange.onchange = function(){
+                console.log("clicked on reason");
+                hideAndShowFields(reasonPatientNotContacted);
+            };
+            var resultPickedChange = document.getElementById('result_picked');
+            resultPickedChange.onchange = function(){
+                hideAndShowFields(resultPicked);
+            };
+
+            //on change the locations
+            var facilities = document.getElementById("list_facility_location");
+            facilities.onchange = function(){
+                var e = document.getElementById("list_facility_location");
+                var locationDescription = e.options[e.selectedIndex].text;
+                var locationName = e.options[e.selectedIndex].value;
+                setValue('pickup_facility.value',locationName );
+                getField('pickup_facility.value').change();
+
+            };//end
+            ///change on the treatment location
+            var treatmentLocationChange = document.getElementById("list_facility_treatment_location");
+            treatmentLocationChange.onchange = function(){
+                var e = document.getElementById("list_facility_treatment_location");
+                var locationDescription = e.options[e.selectedIndex].text;
+                var locationName = e.options[e.selectedIndex].value;
+                setValue('facility_treatment.value',locationName );
+                getField('facility_treatment.value').change();
+
+            };//end
+            var facilityScheduledLocationchange = document.getElementById("list_facility_scheduled_location");
+            facilityScheduledLocationchange.onchange = function(){
+                var e = document.getElementById("list_facility_scheduled_location");
+                var locationDescription = e.options[e.selectedIndex].text;
+                var locationName = e.options[e.selectedIndex].value;
+                setValue('facility_scheduled.value',locationName );
+                getField('facility_scheduled.value').change();
+
+            };//end
+
+            var treatmentInitiatedChange = document.getElementById('treatment_initiated');
+            treatmentInitiatedChange.onchange = function(){
+                hideAndShowFields(treatmentInitiated);
+            };
+            var  sampleResubmissionchange = document.getElementById('sample_resubmission');
+            sampleResubmissionchange.onchange = function(){
+                hideAndShowFields(facilityScheduled);
+            };	           });
+
+        //generalize function to hide and show the fields according the action listeners
+        function  hideAndShowFields(type){
+            var facilityLocation =document.getElementById('list_facility_location');
+            var facilityTreatment=document.getElementById('list_facility_treatment_location');
+            var facilityScheduledloc=document.getElementById('list_facility_scheduled_location');
+
+            if (type == testTypes ) {
+                var testType = getValue('test_type.value');
+                var gxpResultValues = '<lookup expression="fn.latestObs(162202).valueCoded.name" />';
+                var afbResultValues = '<lookup expression="fn.latestObs(307).valueCoded.name" />';
+                var HbAResultValues = '<lookup expression="fn.latestObs(159644).valueNumeric" />';
+                hideAndShowFields(contactPatient);
+
+                if (testType == 165359) {
+                    // alert("is called111");
+                    console.log("values:-"+gxpResultValues);
+                    getField("gxp_result.value").prop('disabled',false);
+                    setValue('gxp_result.value', gxpResultValues);
+                    getField("gxp_result.value").prop('disabled',true);
+                    doubleCheck();
+                    //hideAndShowFields(treatmentInitiated);
+                    hideAndShowFields(sampleResubmission);
+                }else if (testType ==  165738) {
+                    //alert("is called1131");
+                    console.log("values:-"+HbAResultValues);
+                    getField("hba_result.value").prop('disabled',false);
+                    setValue('hba_result.value', HbAResultValues);
+                    getField("hba_result.value").prop('disabled',true);
+                    doubleCheck();
+                    // hideAndShowFields(treatmentInitiated);
+                    hideAndShowFields(sampleResubmission);
+                }
+                else if (testType == 164726) {
+                    //alert("is called112");
+                    console.log("values:-"+afbResultValues);
+                    getField("afb_result.value").prop('disabled',false);
+                    setValue('afb_result.value', afbResultValues);
+                    getField("afb_result.value").prop('disabled',true);
+                    doubleCheck();
+                    //  hideAndShowFields(treatmentInitiated);
+                    hideAndShowFields(sampleResubmission);
+                }
+                else{
+                    //alert("is called");
+                    doubleCheck();
+                    hideAndShowFields(sampleResubmission);
+                }
+
+            }//parend if close here  for test type ...
+
+            else if (type == contactPatient) {
+
+                var contactPatientValues = getValue('patient_contacted.value');
+                var reasonPatientNotContacted = getValue('reason_patient_not_contacted.value');
+                var resultPickedValues = getValue('result_picked.value');
+
+                if (contactPatientValues == 1066) {
+
+                    // $j("#reason_patient_not_contacted_other_tr").show();
+                    $j("#reason_patient_not_contacted_tr").show();
+                    $j("#result_picked_tr").hide();
+                    setValue('result_picked.value','');
+                    $j("#pickup_facility_tr").hide();
+                    setValue('pickup_facility.value','');
+                    facilityLocation.value = '';
+                    $j("#treatment_initiated_tr").hide();
+                    setValue('treatment_initiated.value','');
+                    $j("#list_facility_treatment_location_tr").hide();
+                    setValue('facility_treatment.value','');
+                    facilityTreatment.value = '';
+                    $j("#reason_treatment_not_started_tr").hide();
+                    setValue('reason_treatment_not_started.value','');
+                    $j("#sample_resubmission_tr").hide();
+                    setValue('sample_resubmission.value','');
+                    /* $j("#facility_scheduled_tr").hide();
+                     setValue('facility_scheduled.value','');
+                     facilityScheduledloc.value='';	*/
+                    //document.getElementById('list_facility_scheduled_location').value = '';
+                    // $j("#facility_visit_date_tr").hide();
+                    $j("#Comments_tr").hide();
+                    setValue('cc_comments.value','');
+
+                    if (reasonPatientNotContacted == 164473) {
+                        // alert("inset other called");
+                        $j("#reason_patient_not_contacted_other_tr").show();
+                    }
+                    else{
+                        //alert("inset other else called");
+                        $j("#reason_patient_not_contacted_other_tr").hide();
+                    }
+
+                    /*// $j("#reason_patient_not_contacted_tr").show();
+                      $j("#facility_visit_date_tr").show();
+                      hideAndShowFields(reasonPatientNotContacted); */
+                }else if(contactPatientValues == 1065){
+                    // alert("called");
+                    $j("#result_picked_tr").show();
+                    $j("#reason_patient_not_contacted_tr").hide();
+                    $j("#reason_patient_not_contacted_other_tr").hide();
+                    // $j("#facility_visit_date_tr").show();
+                    $j("#Comments_tr").show();
+                    // alert("contact");
+                    hideAndShowFields(sampleResubmission);
+                }
+                /* else if (contactPatientValues ==165784) {
+
+
+                 }*/
+                else {
+                    $j("#result_picked_tr").show();
+
+                    if (resultPickedValues != 1065) {
+                        $j("#pickup_facility_tr").hide();
+                        setValue('pickup_facility.value','');
+                        facilityLocation.value ='';
+
+                    }
+
+                    $j("#treatment_initiated_tr").hide();
+                    setValue('treatment_initiated.value','');
+                    $j("#reason_treatment_not_started_tr").hide();
+                    setValue('reason_treatment_not_started.value','');
+                    hideAndShowFields(facilityScheduled);
+                    $j("#list_facility_treatment_location_tr").hide();
+                    setValue('facility_treatment.value','');
+                    facilityTreatment.value = '';
+                    $j("#reason_patient_not_contacted_other_tr").hide();
+                    //$j("#facility_visit_date_tr").hide();
+                    $j("#Comments_tr").show();
+                    hideAndShowFields(sampleResubmission);
+
+                }
+
+            }//end if condition of  contact patient
+
+            else if (type == reasonPatientNotContacted ) {
+                var reasonPatientNotContactedValues = getValue('reason_patient_not_contacted.value');
+
+                if (reasonPatientNotContactedValues == 164473)  {
+                    console.log("other section is called");
+                    $j("#reason_patient_not_contacted_other_tr").show();
+                    $j("#result_picked_tr").hide();
+                    setValue('result_picked.value','');
+                    $j("#pickup_facility_tr").hide();
+                    setValue('pickup_facility.value','');
+                    //document.getElementById('list_facility_location').value = '';
+                    $j("#treatment_initiated_tr").hide();
+                    setValue('treatment_initiated.value','');
+                    $j("#list_facility_treatment_location_tr").hide();
+                    setValue('facility_treatment.value','');
+                    //document.getElementById('list_facility_treatment_location').value = '';
+                    $j("#reason_treatment_not_started_tr").hide();
+                    setValue('reason_treatment_not_started.value','');
+                    $j("#sample_resubmission_tr").hide();
+                    setValue('sample_resubmission.value','');
+                    /*$j("#facility_scheduled_tr").hide();
+                    setValue('facility_scheduled.value','');*/
+                    facilityLocation.value = '';
+                    facilityTreatment.value = '';
+                    //facilityScheduledloc.value='';
+
+                    //$j("#facility_visit_date_tr").hide();
+                    $j("#Comments_tr").hide();
+                    setValue('cc_comments.value','');
+
+                }
+                else{
+                    $j("#reason_patient_not_contacted_other_tr").hide();
+                    setValue('reason_patient_not_contacted_other.value','');
+                    $j("#Comments_tr").show();
+                    //$j("#facility_visit_date_tr").show();
+                    $j("#result_picked_tr").show();
+                    hideAndShowFields(resultPicked);
+                }
+            }//end if condtion reason patient not contacted ...
+
+            else if (type == resultPicked) {
+
+                var resultPickedValues = getValue('result_picked.value');
+                var sampleResubmissionValues = getValue('sample_resubmission.value');
+                var gxpResultValue = getValue('gxp_result.value');
+
+                if (resultPickedValues == 1065) {
+                    if (gxpResultValue == 165361 || gxpResultValue == 163611 || gxpResultValue == 164312) {
+                    }else{
+                        doubleCheck();
+                        hideAndShowFields(treatmentInitiated);
+                    }
+
+                }
+                else{
+
+                    $j("#pickup_facility_tr").hide();
+                    //document.getElementById('list_facility_location').value = '';
+                    $j("#treatment_initiated_tr").hide();
+                    setValue('treatment_initiated.value','');
+                    $j("#reason_treatment_not_started_tr").hide();
+                    setValue('reason_treatment_not_started.value','');
+                    hideAndShowFields(facilityScheduled);
+                    $j("#list_facility_treatment_location_tr").hide();
+                    setValue('facility_treatment.value','');
+                    facilityTreatment.value = '';
+                }
+                /*else if (resultPickedValues == 1066) {
+                   $j("#pickup_facility_tr").hide();
+                   $j("#treatment_initiated_tr").hide();
+                   setValue('treatment_initiated.value','');
+                   $j("#reason_treatment_not_started_tr").hide();
+                   setValue('reason_treatment_not_started.value','');
+                   $j("#facility_scheduled_tr").hide();
+                   $j("#list_facility_treatment_location_tr").hide();
+                   setValue('facility_treatment.value', '');
+
+                  }
+                  else{
+                           alert("else condtion");
+                         doubleCheck();
+                    // hideAndShowFields(treatmentInitiated);
+                  }*/
+            }//end the if condtion for result picked
+            else if (type == treatmentInitiated) {
+
+                var treatmentInitiatedValues = getValue('treatment_initiated.value');
+
+                if (treatmentInitiatedValues == 1065) {
+
+                    $j("#list_facility_treatment_location_tr").show();
+                    $j("#reason_treatment_not_started_tr").hide();
+                    //alert("treatm 1065");
+                    /*	$j("#facility_scheduled_tr").hide();
+                        setValue('facility_scheduled.value','');*/
+                    facilityTreatment.value='';
+                    //facilityScheduledloc.value='';
+
+                }
+                else if (treatmentInitiatedValues == 1066) {
+
+                    $j("#list_facility_treatment_location_tr").hide();
+                    $j("#reason_treatment_not_started_tr").show();
+                    //$j("#facility_scheduled_tr").show();
+                    /* <ifMode mode="ENTER">
+                    // alert("inside the enter mode");
+                      setValue('facility_scheduled.value','');
+                      facilityScheduledloc.value='';
+                    </ifMode>///*/
+                    /*setValue('facility_scheduled.value','');
+                     facilityScheduledloc.value='';*/
+                }
+                else{
+
+                    $j("#list_facility_treatment_location_tr").hide();
+                    $j("#reason_treatment_not_started_tr").hide();
+                    ///alert("treatmentInitiated else null");
+                    /*	$j("#facility_scheduled_tr").hide();
+                        setValue('facility_scheduled.value','');*/
+                    facilityTreatment.value = '';
+
+                }
+            }// end if contion  treatment initiated ...
+            else if (type == sampleResubmission) {
+                var gxpResultValue = getValue('gxp_result.value');
+                var sampleResubmissionValues = getValue('sample_resubmission.value');
+                var contactPatientValues = getValue('patient_contacted.value');
+                var treatmentInitiatedValues = getValue('treatment_initiated.value');
+                // alert("called sample_resubmission");
+                if(contactPatientValues != 1066){
+                    if (gxpResultValue == 165361 || gxpResultValue == 163611 || gxpResultValue == 164312) {
+                        $j("#sample_resubmission_tr").show();
+                    }
+                    else{
+                        $j("#sample_resubmission_tr").hide();
+                        setValue('sample_resubmission.value','');
+                        /*// alert("inside the t");
+                        if ((treatmentInitiatedValues!='' &amp;&amp;treatmentInitiatedValues != 1066) || (sampleResubmissionValues !=159413 &amp;&amp; sampleResubmissionValues !='') ){
+                            // alert("inside the t");
+                            $j("#facility_scheduled_tr").hide();
+                            setValue('facility_scheduled.value','');
+                         facilityScheduledloc.value='';
+                     }*/
+
+                    }
+                }
+            }// end the if condition of sample resubmission
+
+            else if (type == facilityScheduled) {
+
+                /*var treatmentInitiatedValues = getValue('treatment_initiated.value');
+                var sampleResubmissionValues = getValue('sample_resubmission.value');
+
+                if (sampleResubmissionValues == 159413 || treatmentInitiatedValues == 1066) {
+                    $j("#facility_scheduled_tr").show();
+                }else{
+                     //alert("type facilityScheduled");
+                    $j("#facility_scheduled_tr").hide();
+                    setValue('facility_scheduled.value','');
+                   facilityScheduledloc.value='';
+                }*/
+
+            }//end the  if condition fo facility scheduled
+                }//end function body ...
+
+        //double condtion  for single fields ...
+        function doubleCheck(){
+
+            var resultPickedValues = getValue('result_picked.value');
+            var testType = getValue('test_type.value');
+            var gxpResultValue = getValue('gxp_result.value');
+            var afbSmearResultValue = getValue('afb_result.value');
+            var hbaResultValue= getValue('hba_result.value');
+            console.log("treatment condtion is called");
+            if (resultPickedValues == 1065){
+
+                if (gxpResultValue == 1301) {
+
+                    $j("#treatment_initiated_tr").show();
+                    hideAndShowFields(treatmentInitiated);
+                } else if (afbSmearResultValue != 664 &amp;&amp; afbSmearResultValue != '') {
+
+                    $j("#treatment_initiated_tr").show();
+                    hideAndShowFields(treatmentInitiated);
+                }
+                else if (hbaResultValue == 6.5 || hbaResultValue &gt; 6.5) {
+
+                    $j("#treatment_initiated_tr").show();
+                    hideAndShowFields(treatmentInitiated);
+                }
+                else{
+
+                    $j("#treatment_initiated_tr").hide();
+                    setValue('treatment_initiated.value', '');
+                    $j("#list_facility_treatment_location_tr").hide();
+                    $j("#reason_treatment_not_started_tr").hide();
+                    hideAndShowFields(facilityScheduled);
+                }
+            }//end main if condtion ...
+            else{
+
+                $j("#treatment_initiated_tr").hide();
+                $j("#list_facility_treatment_location_tr").hide();
+                //setValue('treatment_initiated.value', '');
+            }
+        } //end
+
+        ///get the location using Ajax call ...
+        function getLocations(){
+            jQuery.ajax({
+                url: "/openmrs/ws/rest/v1/location?v=custom:(uuid,display,name,description,tags:(name),attributes:(value,voided,attributeType:(display)))",
+                dataType: 'json'
+            }).done(function(data ) {
+                locationFilter(data);
+              //  console.log(JSON.stringify(data));
+            });
+        }
+        function locationFilter(data) {
+          //  alert(":-" + JSON.stringify(data));
+            var location =[];
+            var tagsName = [];
+            var locationTypeArray = [];
+            var locationAttrType = [];
+            var count = 0;
+            var count2 = 0;
+            var facilityScheduledLocation = document.getElementById('list_facility_scheduled_location');
+            for (i = 0; i &lt; data.results.length; i++) {
+                   if (data.results[i].name == "Unknown Location" ) {
+                        resultArr[count] = data.results[i];
+                        count++;
+                   }
+                   else {
+                         for (j = 0; j &lt; data.results[i].attributes.length; j++){
+                             locationAttrType[count2] =  data.results[i].attributes[j].attributeType;
+                             for (s = 0; s &lt; locationAttrType.length; s++){
+                                 if (locationAttrType[s].display == "Location Type" ) {
+                                     if((data.results[i].attributes[j].value =="Clinic" || data.results[i].attributes[j].value =="Hospital") &amp;&amp; data.results[i].attributes[j].voided == false) {
+                                         resultArr[count] = data.results[i];
+                                         count++;
+                                     }
+                                 }
+                             }
+                         }//attribute
+                   }
+            }
+           fillLocation(resultArr);
+        }
+
+        //populate the location on dropdown ...
+        function  fillLocation(data){
+              //  alert("Befor Filter:-" + JSON.stringify(data));
+            var locations = document.getElementById('list_facility_location');
+            var treatmentLocation= document.getElementById('list_facility_treatment_location');
+            var facilityScheduledLocation = document.getElementById('list_facility_scheduled_location');
+            data = treadmentTbFilter(data);
+             // alert("after Filter:-" + JSON.stringify(data));
+            for (i = 0; i &lt; data.length; i++) {
+
+                  locations.options[i+1]= new Option(data[i].description, data[i].name);
+                  treatmentLocation.options[i+1]= new Option(data[i].description, data[i].name);
+                  facilityScheduledLocation.options[i+1]= new Option(data[i].description,data[i].name);
+                  var resultObject =  JSON.parse(JSON.stringify(data[i].description || null));
+             }
+             locations.value = '';
+              getField("pickup_facility.value").prop('disabled',false);
+              <ifMode mode="ENTER">
+                      setValue('pickup_facility.value', '');
+                  getField("pickup_facility.value").prop('disabled',true);
+              </ifMode>
+              <ifMode mode="EDIT">
+                      //setValue('pickup_facility.value', '');
+                  getField("pickup_facility.value").prop('disabled',true);
+              </ifMode>
+                  ///
+                  treatmentLocation.value = '';
+                  getField("facility_treatment.value").prop('disabled',false);
+              <ifMode mode="ENTER">
+                      setValue('facility_treatment.value', '');
+                     getField("facility_treatment.value").prop('disabled',true);
+              </ifMode>
+              <ifMode mode="EDIT">
+                      //setValue('facility_treatment.value', '');
+                     getField("facility_treatment.value").prop('disabled',true);
+              </ifMode>
+                  facilityScheduledLocation.value = '';
+                  getField("facility_scheduled.value").prop('disabled',false);
+              <ifMode mode="ENTER">
+                      setValue('facility_scheduled.value', '');
+                  getField("facility_scheduled.value").prop('disabled',true);
+              </ifMode>///
+              <ifMode mode="EDIT">
+                    //  setValue('facility_scheduled.value', '');
+                  getField("facility_scheduled.value").prop('disabled',true);
+              </ifMode>///
+        }
+
+        function treadmentTbFilter(resultArray) {
+                   treadmentTbArray =[];
+                   var count =0;
+                   for (j = 0; j &lt; resultArray.length; j++){
+                     if(resultArray[j].name == "Unknown Location"){
+                           treadmentTbArray[count] = resultArray[j];
+                           count++;
+                        }
+                        else {
+                            for(h = 0; h &lt; resultArray[j].tags.length; h++){
+                                if(resultArray[j].tags[h].name == "Treatment (TB)"){
+                                    treadmentTbArray[count] = resultArray[j];
+                                    count++;
+                                }
+                            }//tags
+                        }
+
+                   }
+                   return treadmentTbArray;
+               }
+
+
+      /*  function treadmentAndTestTbFilter(resultArray) {
+                   treadmentTbArray =[];
+                   var count =0;
+                   //we need the unknown location so add location..
+                   for (j = 0; j &lt; resultArray.length; j++){
+                       if(resultArray[j].name == "Unknown Location"){
+                             treadmentTbArray[count] = resultArray[j];
+                             count++;
+                          }
+                          else{
+                              for(h = 0; h &lt; resultArray[j].tags.length; h++){
+                                  if(resultArray[j].tags[h].name == "Treatment (TB)" || resultArray[j].tags[h].name == "Test"){
+                                      if(!treadmentTbArray.includes(resultArray[j])){
+                                         treadmentTbArray[count] = resultArray[j];
+                                         count++;
+                                      }
+                                  }
+                              }//tags
+                          }
+                   }
+                   return treadmentTbArray;
+               }
+        */
+
+        ///submit form
+        beforeSubmit.push(function() {
+            var valid = true;
+            var gxpResultValue = getValue('gxp_result.value');
+            var afbSmearResultValue = getValue('afb_result.value');
+            var hbaResultValue= getValue('hba_result.value');
+            var patientContacted = getValue('patient_contacted.value');
+            var resultPicked = getValue('result_picked.value');
+            var reasonPatientNotContacted = getValue('reason_patient_not_contacted.value');
+            var treatmentInitiated = getValue('treatment_initiated.value');
+            var sampleResubmission = getValue('sample_resubmission.value');
+            var gxpResultValue = getValue('gxp_result.value');
+
+
+            var facility_visit_date_val =  getValue('facility_visit_date.value');
+            // alert(facility_visit_date_val);
+            var errorMessage= 'This field can not be empty';
+            //alert("initiated :- "+ valid);
+            if ((facility_visit_date_val == null || facility_visit_date_val == '') &amp;&amp; patientContacted == 1065 ) {
+                /* if(reasonPatientNotContacted != 164473){*/
+
+                getField('facility_visit_date.error').html(errorMessage).show();
+                valid = false;
+                //}
+
+            }else{
+                getField('facility_visit_date.error').html('').hide();
+            }
+            if (getValue('reason_patient_not_contacted.value')=='' &amp;&amp; patientContacted ==1066)
+            {
+                getField('reason_patient_not_contacted.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('reason_patient_not_contacted.error').html('').hide();
+            }
+            if (getValue('reason_patient_not_contacted_other.value')==''  &amp;&amp;  reasonPatientNotContacted == 164473)
+            {
+                getField('reason_patient_not_contacted_other.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('reason_patient_not_contacted_other.error').html('').hide();
+            }
+            // alert("reason_patient_not_contacted_other :- "+ valid);
+            if (getValue('pickup_facility.value') == '' &amp;&amp; resultPicked == 1065)
+            {
+                getField('pickup_facility.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('pickup_facility.error').html('').hide();
+            }
+            /*alert("gxp:"+gxpResultValue);
+            alert("gxp:"+afbSmearResultValue);
+            alert("gxp:"+hbaResultValue);*/
+            //treatment || afbSmearResultValue != 664 || (hbaResultValue == 6.5 || hbaResultValue &gt; 6.5)
+            if (getValue('treatment_initiated.value') == '' &amp;&amp; resultPicked == 1065 &amp;&amp; (gxpResultValue == 1301 || (afbSmearResultValue != 664 &amp;&amp; afbSmearResultValue != '') || (hbaResultValue == 6.5 || hbaResultValue &gt; 6.5) ))
+            {
+                getField('treatment_initiated.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('treatment_initiated.error').html('').hide();
+            }
+            //alert("pickup_facility :- "+ valid);
+            if ( getValue('facility_treatment.value') == '' &amp;&amp; treatmentInitiated == 1065)
+            {
+                getField('facility_treatment.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('facility_treatment.error').html('').hide();
+            }
+            //alert("facility_treatment :- "+ valid);
+            if ( getValue('reason_treatment_not_started.value') == ''&amp;&amp; treatmentInitiated == 1066)
+            {
+                getField('reason_treatment_not_started.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('reason_treatment_not_started.error').html('').hide();
+            }
+            // alert("reason_treatment_not_started :- "+ valid);
+            if ( getValue('facility_scheduled.value') == '' &amp;&amp; patientContacted == 1065 )
+            {
+                getField('facility_scheduled.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('facility_scheduled.error').html('').hide();
+            }
+            // alert("facility_scheduled :- "+ valid);gxpResultValue == 165361 || gxpResultValue == 163611 || gxpResultValue == 164312
+            if ( getValue('sample_resubmission.value') == '' &amp;&amp; (gxpResultValue == 165361 || gxpResultValue == 163611 || gxpResultValue == 164312) &amp;&amp; patientContacted != 1066)
+            {
+                getField('sample_resubmission.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('sample_resubmission.error').html('').hide();
+            }
+            // alert("sample sampleResubmission :- "+ valid);
+            if ( getValue('result_picked.value') == '' &amp;&amp; (patientContacted != 1066  &amp;&amp;  reasonPatientNotContacted != 164473))
+            {
+                getField('result_picked.error').html(errorMessage).show();
+                valid = false;
+            }
+            else{
+                getField('result_picked.error').html('').hide();
+            }
+            // alert("result_picked :- "+ valid);
+
+
+            if(valid == true){
+
+                getField("facility_scheduled.value").prop('disabled',false);
+                getField("afb_result.value").prop('disabled',false);
+                getField("hba_result.value").prop('disabled',false);
+                getField("gxp_result.value").prop('disabled',false);
+                getField("pickup_facility.value").prop('disabled',false);
+                getField("facility_treatment.value").prop('disabled',false);
+
+            }
+            return valid;
+        });
+    </script>
+</htmlform>
+<!-- Completed -->

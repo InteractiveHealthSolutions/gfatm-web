@@ -1,0 +1,152 @@
+<htmlform>
+	<!-- Developed by Ali -->
+	<macros>
+		paperFormId = (Fill this in)
+		headerColor =#009d8e
+		fontOnHeaderColor = white
+	</macros>
+
+	<style>
+		.section {
+			border: 1px solid $headerColor;
+			padding: 2px;
+			text-align: left;
+			margin-bottom: 1em;
+		}
+		.sectionHeader {
+			background-color: $headerColor;
+			color: $fontOnHeaderColor;
+			display: block;
+			padding: 2px;
+			font-weight: bold;
+		}
+		table.baseline-aligned td {
+			vertical-align: baseline;
+		}
+	</style>
+        <script type="text/javascript">
+	  
+			 var startDate = new Date();
+		  
+		   var mode = 1;
+		   
+           if(jQuery){
+
+                     jQuery(document).ready(function(){
+					 
+						function setTxDay() {
+
+							var month =  <lookup complexExpression="#set( $enc = $fn.latestEncounter('f2038177-d0ee-4856-ab41-2b9bad0e949e') ) #set( $ob = $fn.getObs($enc,'163526') ) $!{ob.getValueDatetime().getMonth()}"/>
+							var year =  <lookup complexExpression="#set( $enc = $fn.latestEncounter('f2038177-d0ee-4856-ab41-2b9bad0e949e') ) #set( $ob = $fn.getObs($enc,'163526') ) $!{ob.getValueDatetime().getYear()}"/>
+							var date =  <lookup complexExpression="#set( $enc = $fn.latestEncounter('f2038177-d0ee-4856-ab41-2b9bad0e949e') ) #set( $ob = $fn.getObs($enc,'163526') ) $!{ob.getValueDatetime().getDate()}"/>
+							
+							if(year &lt; 1900)
+								year = 1900 + year;
+							
+							var txStartDate = new Date(year,month,date);
+							
+
+							var reportingDateStr = getField("date_DOT.value").val();
+							
+							if(reportingDateStr=="") {
+								 return;
+							}
+							
+							var parts = reportingDateStr.split("-");
+							
+							var reportingDate = new Date(parts[0],parts[1]-1,parts[2]); 
+
+							var timeDiff = Math.abs(reportingDate.getTime()-txStartDate.getTime());
+							var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+							
+							setValue("day_number_treatment.value",diffDays);
+
+						}
+						
+						getField("time_taken.value").prop('readonly',true);
+						getField("day_number_treatment.value").prop('readonly',true);
+						
+						<ifMode mode="ENTER">
+						 mode = 1;
+						 </ifMode>
+						 
+						 <ifMode mode="EDIT">
+						  mode = 0;
+						  </ifMode>
+						
+						if(mode==1)
+							setTxDay();
+						
+						 <ifMode mode="EDIT">
+						  mode = 1;
+						  </ifMode>
+						
+						getField("date_DOT.value").change(setTxDay);
+							
+                     });
+           }
+		   
+		   beforeSubmit.push(function() {
+
+				var valid = true;
+	
+				<ifMode mode="ENTER">
+                     if(valid==true) {
+                        var endDate = new Date();
+                        var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+	                    var diffSec = timeDiff/1000;
+
+                        setValue("time_taken.value", diffSec);
+					}	
+                </ifMode>
+	
+				return valid;
+     
+            });
+		   
+		   </script>
+
+	 <!-- <table class="baseline-aligned">
+         
+         </table> -->
+	<h2>PMDT-Daily Treatment Monitoring</h2>
+
+	<section headerLabel="Encounter Details">
+		<table class="baseline-aligned">
+			<tr>
+				<td>Date:</td>
+				<td><encounterDate id="encounter_date" default="today" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Location:</td>
+				<td><encounterLocation id="encounter_location" required="true" /></td>
+			</tr>
+			<tr>
+				<td>Provider:</td>
+				<td><encounterProvider id="encounter_provider" required="true" /></td>
+			</tr>
+		</table>
+	</section>
+
+	<section headerLabel="Daily Treatment Monitoring">
+		<table class="baseline-aligned">
+		      <tr>
+                  <td><obs id="date_DOT" conceptId="164413" labelText="Date of reporting" required="true" defaultValue="now" allowTime="false" /></td>
+              </tr>
+			  <tr>
+                  <td><obs id="day_number_treatment" conceptId="164419" labelText="Which day of treatment?" required="true" /></td>
+              </tr>
+			  <tr>
+                  <td><obs id="DOT_adherence" conceptId="164417" labelText="Is it a fully observed day, missed prescribed day, or an incomplete prescribed day?" answerConceptIds="164414,164415,164416" answerLabels="Fully Observed day,Missed prescribed day,Incomplete prescribed day" defaultValue="164414" required="true" /></td>
+              </tr>
+			   <tr>
+                  <td><obs id="DOT_adverse_event" conceptId="164418" labelText="Does the patient have an adverse event?" answerConceptIds="1065,1066" answerLabels="Yes,No" defaultValue="1066" required="true" /></td>
+              </tr>
+             <tr>
+                 <td><obs id="time_taken" conceptId="165044" labelText = "Time Taken to Fill Form" /></td>
+             </tr> 
+        </table>
+	</section>
+       
+    <submit/>			
+</htmlform>
