@@ -30,22 +30,19 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ihsinformatics.gfatmweb.server.AicWebService;
-
 /**
  * @author owais.hussain@ihsinformatics.com
  *
  */
 public class FastWebServiceTest {
 
-	private static final String URL = "http://127.0.0.1:8888/fastweb.jsp";
+	private static final String URL = "http://127.0.0.1:8888/fastwebservice";
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		new AicWebService();
 	}
 
 	/**

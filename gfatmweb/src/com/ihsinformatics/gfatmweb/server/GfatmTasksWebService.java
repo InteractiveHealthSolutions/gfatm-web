@@ -1,33 +1,28 @@
+package com.ihsinformatics.gfatmweb.server;
 /* Copyright(C) 2016 Interactive Health Solutions, Pvt. Ltd.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
-You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
+ See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
+ You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
 
-Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
+ Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
  */
 /**
  * 
  */
-package com.ihsinformatics.gfatmweb.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletInputStream;
@@ -36,15 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.ValidationException;
 
 import org.hibernate.HibernateException;
-import org.ihs.emailer.EmailEngine;
-import org.ihs.emailer.EmailException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
-import com.google.gwt.dev.json.JsonObject;
 import com.ihsinformatics.gfatmweb.shared.RequestType;
-import com.ihsinformatics.tbreachapi.core.TBR;
 import com.ihsinformatics.tbreachapi.core.service.impl.ServerService;
 import com.ihsinformatics.tbreachapi.model.Element;
 import com.ihsinformatics.tbreachapi.model.Location;
@@ -65,37 +56,8 @@ public class GfatmTasksWebService extends AbstractWebService {
 	 * 
 	 */
 	private static final long serialVersionUID = 6109274182101835832L;
-	private static final String encoding = "UTF-8";
 
 	public GfatmTasksWebService() {
-		if (!ServerService.isRunning()) {
-			try {
-				InputStream inputStream = Thread.currentThread()
-						.getContextClassLoader()
-						.getResourceAsStream(PROP_FILE_NAME);
-				prop = new Properties();
-				prop.load(inputStream);
-				TBR.readProperties(PROP_FILE_NAME);
-				TBR.props = prop;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			guestUsername = prop.getProperty("guest.username");
-			guestPassword = prop.getProperty("guest.password");
-			apiService.startup();
-			ServerService.isLoggedIn();
-			try {
-				// Start email engine
-				EmailEngine.instantiateEmailEngine(prop);
-			} catch (EmailException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Timer time = new Timer(); // Instantiate Timer Object
-		ScheduledTask st = new ScheduledTask(); // Instantiate SheduledTask
-												// class
-		time.schedule(st, 0, 25200000); // run function for sql
 	}
 
 	/*
@@ -109,16 +71,12 @@ public class GfatmTasksWebService extends AbstractWebService {
 	public void handleRequest(HttpServletRequest request,
 			HttpServletResponse resp) throws IOException, JSONException {
 
-		ServerService serverService = apiService;
 		PrintWriter out = resp.getWriter();
 		JSONObject jsonResponse = new JSONObject();
 		String response = null;
 		String content = "";
 		String responseDetail = "";
 		Date dateEntered;
-		Date endtime;
-		Date starttime;
-		long seconds = 0;
 		setRequest(request);
 
 		if (request.getMethod().equalsIgnoreCase("GET")) {
@@ -144,7 +102,7 @@ public class GfatmTasksWebService extends AbstractWebService {
 			out.flush();
 			return;
 		}
-		String[] fixedParameters = { "type", "username", "password", "location" };
+		String[] fixedParameters = {"type", "username", "password", "location"};
 		for (String param : fixedParameters) {
 			if (!jsonObj.has(param)) {
 				response = "ERROR";
@@ -157,13 +115,12 @@ public class GfatmTasksWebService extends AbstractWebService {
 			}
 		}
 		String requestType = jsonObj.getString("type");
-		String username = jsonObj.getString("username");
+		jsonObj.getString("username");
 		Map<String, Object> fixedParamsMap = new HashMap<String, Object>();
 		for (String eachparam : fixedParameters) {
 			fixedParamsMap.put(eachparam, jsonObj.getString(eachparam));
 			jsonObj.remove(eachparam);
 		}
-		
 
 		boolean login1 = apiService.login(guestUsername, guestPassword,
 				fixedParamsMap.get("location").toString());
@@ -196,16 +153,15 @@ public class GfatmTasksWebService extends AbstractWebService {
 			Map<String, Object> params = parseContent(jsonObj);
 
 			jsonResponse = doSearch(fixedParamsMap.get("username").toString(),
-					requestType, jsonObj.get("age_range").toString(),
-					jsonObj.get("gender").toString(), params);
+					requestType, jsonObj.get("age_range").toString(), jsonObj
+							.get("gender").toString(), params);
 
 		} else if (requestType.equals(RequestType.GFATM_FEEDBACK)) {
-		
-			
-			try {				
-				dateEntered = DateTimeUtil.getDateFromString(
-						jsonObj.get("entereddate").toString(), DateTimeUtil.SQL_DATE);
-			} catch (ParseException e) {
+
+			try {
+				dateEntered = DateTimeUtil.fromSqlDateString(fixedParamsMap
+						.get("entereddate").toString());
+			} catch (Exception e) {
 				e.printStackTrace();
 				response = "ERROR";
 				responseDetail = "Detail: Parse exception for Date, Please provide valid format";
@@ -215,9 +171,13 @@ public class GfatmTasksWebService extends AbstractWebService {
 				out.flush();
 				return;
 			}
-			
+
 			Map<String, Object> params = parseContent(jsonObj);
-			jsonResponse = doScreening(fixedParamsMap.get("username").toString(), requestType, dateEntered, params /* TODO: More parameters */);
+			jsonResponse = doScreening(fixedParamsMap.get("username")
+					.toString(), requestType, dateEntered, params /*
+																 * TODO: More
+																 * parameters
+																 */);
 
 		} else if (requestType.equals(RequestType.GFATM_GET_LOCATION)) {
 			jsonResponse = getLocations();
@@ -286,23 +246,23 @@ public class GfatmTasksWebService extends AbstractWebService {
 		}
 		return null;
 	}
-	
-	public JSONObject getLocations(){
+
+	public JSONObject getLocations() {
 		String response = "";
 		String responseDetails = "";
 		JSONObject jsonResponse = new JSONObject();
 		StringBuilder query;
 		List<List<Object>> data;
 		JSONArray locationDetailsArray = new JSONArray();
-		
+
 		try {
-			
+
 			query = new StringBuilder();
-			query.append("SELECT "); 
-			query.append("l.location_id, l.name, l.uuid, l.parent_location, "); 
-			query.append("la1.value_reference as fast_loc, la2.value_reference as childhood_tb_loc, la3.value_reference as pet_loc, "); 
+			query.append("SELECT ");
+			query.append("l.location_id, l.name, l.uuid, l.parent_location, ");
+			query.append("la1.value_reference as fast_loc, la2.value_reference as childhood_tb_loc, la3.value_reference as pet_loc, ");
 			query.append("la4.value_reference as comorbidities_loc, la5.value_reference as pmdt_loc, la6.value_reference as aic_loc, la7.value_reference as contact, la8.value_reference as ztts_loc,");
-			query.append("l.address1, l.address2, l.address3, l.city_village, l.state_province, l.county_district, l.description, la.value_reference, la9.value_reference ");
+			query.append("l.address1, l.address2, l.address3, l.city_village, l.state_province, l.county_district, l.description, la.value_reference ");
 			query.append("FROM openmrs.location l ");
 			query.append("right join openmrs.location_attribute la on l.location_id = la.location_id and la.attribute_type_id = 13 and la.voided = 0  and la.value_reference = 'true' ");
 			query.append("left join openmrs.location_attribute la1 on l.location_id = la1.location_id and la1.attribute_type_id = 3 and la1.voided = 0 ");
@@ -313,24 +273,23 @@ public class GfatmTasksWebService extends AbstractWebService {
 			query.append("left join openmrs.location_attribute la6 on l.location_id = la6.location_id and la6.attribute_type_id = 5 and la6.voided = 0 ");
 			query.append("left join openmrs.location_attribute la7 on l.location_id = la7.location_id and la7.attribute_type_id = 2 and la7.voided = 0 ");
 			query.append("left join openmrs.location_attribute la8 on l.location_id = la8.location_id and la8.attribute_type_id = 17 and la8.voided = 0 ");
-			query.append("left join openmrs.location_attribute la9 on l.location_id = la9.location_id and la9.attribute_type_id = 9 and la9.voided = 0 ");
 			query.append("where l.retired = 0");
 
-			data = apiService.getMetadataService().executeSQL(query.toString(),true);
+			data = apiService.getMetadataService().executeSQL(query.toString(),
+					true);
 			locationDetailsArray = getLocationDetailArray(data);
-			
+
 			response = "SUCCESS";
 			responseDetails = "Detail :  Locations found";
 
 			jsonResponse.put("response", response);
 			jsonResponse.put("details", responseDetails);
 			jsonResponse.put("locationArray", locationDetailsArray);
-			
+
 		} catch (SQLException | JSONException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 		return jsonResponse;
 	}
 
@@ -577,7 +536,7 @@ public class GfatmTasksWebService extends AbstractWebService {
 		return personDetails;
 
 	}
-	
+
 	public JSONArray getLocationDetailArray(List<List<Object>> data) {
 
 		JSONArray locationDetails = new JSONArray();
@@ -589,74 +548,72 @@ public class GfatmTasksWebService extends AbstractWebService {
 				location.put("location_id", dataObj.get(0).toString());
 				location.put("name", dataObj.get(1).toString());
 				location.put("uuid", dataObj.get(2).toString());
-				if(dataObj.get(3) != null)
+				if (dataObj.get(3) != null)
 					location.put("parent_id", dataObj.get(3).toString());
 				else
 					location.put("parent_id", "");
-				if(dataObj.get(4) != null)
+				if (dataObj.get(4) != null)
 					location.put("fast_location", dataObj.get(4).toString());
 				else
 					location.put("fast_location", "false");
-				if(dataObj.get(5) != null)
-					location.put("childhood_tb_location", dataObj.get(5).toString());
+				if (dataObj.get(5) != null)
+					location.put("childhood_tb_location", dataObj.get(5)
+							.toString());
 				else
 					location.put("childhood_tb_location", "false");
-				if(dataObj.get(6) != null)
+				if (dataObj.get(6) != null)
 					location.put("pet_location", dataObj.get(6).toString());
 				else
 					location.put("pet_location", "false");
-				if(dataObj.get(7) != null)
-					location.put("commorbodities_location", dataObj.get(7).toString());
+				if (dataObj.get(7) != null)
+					location.put("commorbodities_location", dataObj.get(7)
+							.toString());
 				else
 					location.put("commorbodities_location", "false");
-				if(dataObj.get(8) != null)
+				if (dataObj.get(8) != null)
 					location.put("pmdt_location", dataObj.get(8).toString());
 				else
 					location.put("pmdt_location", "false");
-				if(dataObj.get(9) != null)
+				if (dataObj.get(9) != null)
 					location.put("aic_location", dataObj.get(9).toString());
 				else
 					location.put("aic_location", "false");
-				if(dataObj.get(10) != null)
+				if (dataObj.get(10) != null)
 					location.put("contact", dataObj.get(10).toString());
 				else
 					location.put("contact", "");
-				if(dataObj.get(11) != null)
+				if (dataObj.get(11) != null)
 					location.put("ztts_location", dataObj.get(11).toString());
 				else
 					location.put("ztts_location", "");
-				if(dataObj.get(12) != null)
+				if (dataObj.get(12) != null)
 					location.put("address1", dataObj.get(12).toString());
 				else
 					location.put("address1", "");
-				if(dataObj.get(13) != null)
+				if (dataObj.get(13) != null)
 					location.put("address2", dataObj.get(13).toString());
 				else
 					location.put("address2", "");
-				if(dataObj.get(14) != null)
+				if (dataObj.get(14) != null)
 					location.put("address3", dataObj.get(14).toString());
 				else
 					location.put("address3", "");
-				if(dataObj.get(15) != null)
+				if (dataObj.get(15) != null)
 					location.put("cityVillage", dataObj.get(15).toString());
 				else
 					location.put("cityVillage", "");
-				if(dataObj.get(16) != null)
+				if (dataObj.get(16) != null)
 					location.put("stateProvince", dataObj.get(16).toString());
 				else
 					location.put("stateProvince", "");
-				if(dataObj.get(17) != null)
+				if (dataObj.get(17) != null)
 					location.put("county_district", dataObj.get(17).toString());
 				else
 					location.put("county_district", "");
-				if(dataObj.get(18) != null)
+				if (dataObj.get(18) != null)
 					location.put("description", dataObj.get(18).toString());
 				else
 					location.put("description", "");
-				if(dataObj.get(20) != null)
-					location.put("location_type", dataObj.get(20).toString());
-				else
-					location.put("location_type", "");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -743,16 +700,5 @@ public class GfatmTasksWebService extends AbstractWebService {
 			jsonResponse.put("details", responseDetail);
 		}
 		return jsonResponse;
-	}
-
-	class ScheduledTask extends TimerTask {
-		public void run() {
-			try {
-				apiService.getMetadataService().executeSQL(
-						"select person_id from gfatm.patient", true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 }

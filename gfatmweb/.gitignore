@@ -1,12 +1,6 @@
 /bin/
-/gwt-unitCache/
-/war/gfatmweb/
-/war/WEB-INF/deploy/
-/war/WEB-INF/lib/gwt-servlet.jar
-/doc/
-/gfatmweb.war
+/target/
 /.settings/
 /.classpath
-/war/tbreach_api.log
 *.class
-
+*.log

@@ -1,31 +1,28 @@
+package com.ihsinformatics.gfatmweb.server;
 /* Copyright(C) 2016 Interactive Health Solutions, Pvt. Ltd.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
-You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
+ See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
+ You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
 
-Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
+ Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
  */
 
 /**
  * 
  */
-package com.ihsinformatics.gfatmweb.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletInputStream;
@@ -34,13 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.ValidationException;
 
 import org.hibernate.HibernateException;
-import org.ihs.emailer.EmailEngine;
-import org.ihs.emailer.EmailException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ihsinformatics.gfatmweb.shared.RequestType;
-import com.ihsinformatics.tbreachapi.core.TBR;
 import com.ihsinformatics.tbreachapi.core.service.impl.ServerService;
 import com.ihsinformatics.tbreachapi.model.Definition;
 import com.ihsinformatics.tbreachapi.model.DefinitionType;
@@ -65,29 +59,6 @@ public class AicWebService extends AbstractWebService {
 	private static final long serialVersionUID = -823823726983678814L;
 
 	public AicWebService() {
-		if (!ServerService.isRunning()) {
-			try {
-				InputStream inputStream = Thread.currentThread()
-						.getContextClassLoader()
-						.getResourceAsStream(PROP_FILE_NAME);
-				prop = new Properties();
-				prop.load(inputStream);
-				TBR.readProperties(PROP_FILE_NAME);
-				TBR.props = prop;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			guestUsername = prop.getProperty("guest.username");
-			guestPassword = prop.getProperty("guest.password");
-			apiService.startup();
-			ServerService.isLoggedIn();
-			try {
-				// Start email engine
-				EmailEngine.instantiateEmailEngine(prop);
-			} catch (EmailException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -156,8 +127,8 @@ public class AicWebService extends AbstractWebService {
 			jsonObj.put("username", guestUsername);
 			jsonObj.put("password", guestPassword);
 		}
-		String[] fixedParameters = { "type", "username", "password",
-				"location", "entereddate" };
+		String[] fixedParameters = {"type", "username", "password", "location",
+				"entereddate"};
 		for (String param : fixedParameters) {
 			if (!jsonObj.has(param)) {
 				response = "ERROR";
@@ -175,9 +146,9 @@ public class AicWebService extends AbstractWebService {
 			jsonObj.remove(eachparam);
 		}
 		try {
-			dateEntered = DateTimeUtil.getDateFromString(
-					fixedParamsMap.get("entereddate").toString(), "yyyy-MM-dd");
-		} catch (ParseException e) {
+			dateEntered = DateTimeUtil.fromSqlDateString(fixedParamsMap.get(
+					"entereddate").toString());
+		} catch (Exception e) {
 			e.printStackTrace();
 			response = "ERROR";
 			responseDetail = "Detail: Parse exception for Date, Please provide valid format";
@@ -223,15 +194,13 @@ public class AicWebService extends AbstractWebService {
 			try {
 				if (params.containsKey("starttime")
 						&& params.containsKey("endtime")) {
-					starttime = DateTimeUtil.getDateFromString(
-							params.get("starttime").toString(),
-							"dd-MM-yyyy hh:mm:ss");
-					endtime = DateTimeUtil.getDateFromString(
-							params.get("endtime").toString(),
-							"dd-MM-yyyy hh:mm:ss");
+					starttime = DateTimeUtil.fromSqlDateTimeString(params.get(
+							"starttime").toString());
+					endtime = DateTimeUtil.fromSqlDateTimeString(params.get(
+							"endtime").toString());
 					seconds = (endtime.getTime() - starttime.getTime()) / 1000;
 				}
-			} catch (ParseException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				response = "ERROR";
 				responseDetail = "Detail: Parse exception for Date, Please provide valid format";
@@ -242,7 +211,7 @@ public class AicWebService extends AbstractWebService {
 				return;
 			}
 			if (requestType.equals(RequestType.UVGI_INSTALLATION)) {
-                
+
 				if (getUserFormResultForUVGIInstallationByUVGIId(params.get(
 						"ID").toString()) != null) {
 					response = "ERROR";
@@ -325,7 +294,7 @@ public class AicWebService extends AbstractWebService {
 				String facility = "";
 				String opd = "";
 				String area = "";
-				String date = DateTimeUtil.getSqlDate(dateEntered);
+				String date = DateTimeUtil.toSqlDateString(dateEntered);
 				List<UserFormResult> resultsForm = apiService
 						.getUserFormService().getUserFormResultsByUserForm(
 								uvgiInstallationUserFormResult.getUserForm());
@@ -418,7 +387,7 @@ public class AicWebService extends AbstractWebService {
 				String facility = "";
 				String opd = "";
 				String area = "";
-				String date = DateTimeUtil.getSqlDate(dateEntered);
+				String date = DateTimeUtil.toSqlDateString(dateEntered);
 				List<UserFormResult> resultsForm = apiService
 						.getUserFormService().getUserFormResultsByUserForm(
 								uvgiInstallationUserFormResult.getUserForm());
@@ -848,7 +817,7 @@ public class AicWebService extends AbstractWebService {
 					} else if (result.getElement().getElementName()
 							.equals("SZC_AREA")) {
 						jsonResponse.put("szc_area", result.getResult());
-					}else if (result.getElement().getElementName()
+					} else if (result.getElement().getElementName()
 							.equals("LOCATION_TYPE")) {
 						jsonResponse.put("location_type", result.getResult());
 					}
@@ -1083,9 +1052,10 @@ public class AicWebService extends AbstractWebService {
 						} else if (result.getElement().getElementName()
 								.equals("SZC_AREA")) {
 							jsonResponse.put("szc_area", result.getResult());
-						}else if (result.getElement().getElementName()
+						} else if (result.getElement().getElementName()
 								.equals("LOCATION_TYPE")) {
-							jsonResponse.put("location_type", result.getResult());
+							jsonResponse.put("location_type",
+									result.getResult());
 						}
 					}
 					resultsForm = apiService.getUserFormService()
@@ -1223,12 +1193,16 @@ public class AicWebService extends AbstractWebService {
 		List<Location> locs = apiService.getLocationService().getAllLocations();
 		int locSize = 0;
 		for (int i = 0; i < locs.size(); i++) {
-			List<LocationAttribute> locationAttributes = apiService.getLocationService().getLocationAttributesByLocation(locs.get(i));
-			for(LocationAttribute la : locationAttributes){
-				if(la.getLocationAttributeType().getAttributeName().equals("AIC Location") && la.getAttributeValue().equals("true"))
+			List<LocationAttribute> locationAttributes = apiService
+					.getLocationService().getLocationAttributesByLocation(
+							locs.get(i));
+			for (LocationAttribute la : locationAttributes) {
+				if (la.getLocationAttributeType().getAttributeName()
+						.equals("AIC Location")
+						&& la.getAttributeValue().equals("true"))
 					locSize++;
 			}
-			
+
 		}
 		hashMap.put("loc_size", locSize);
 		return hashMap;
@@ -1256,8 +1230,7 @@ public class AicWebService extends AbstractWebService {
 				jsonResponse.put("opd_area_" + i, opdAreaDefinitions.get(i)
 						.getDefinition());
 			}
-			
-			
+
 			DefinitionType szcAreaDefinitionType = apiService
 					.getMetadataService().getDefinitionTypeByName("SZC_AREA");
 			List<Definition> szcAreaDefinitions = apiService
@@ -1268,19 +1241,26 @@ public class AicWebService extends AbstractWebService {
 				jsonResponse.put("szc_area_" + i, szcAreaDefinitions.get(i)
 						.getDefinition());
 			}
-			
+
 			List<Location> locs = apiService.getLocationService()
 					.getAllLocations();
 			int locSize = 0;
 			for (int i = 0; i < locs.size(); i++) {
-				List<LocationAttribute> locationAttributes = apiService.getLocationService().getLocationAttributesByLocation(locs.get(i));
-				for(LocationAttribute la : locationAttributes){
-					if(la.getLocationAttributeType().getAttributeName().equals("AIC Location") && la.getAttributeValue().equals("true")){
-						jsonResponse.put("loc_" + locSize, locs.get(i).getDescription() + " (" + locs.get(i).getLocationName() + ")");
+				List<LocationAttribute> locationAttributes = apiService
+						.getLocationService().getLocationAttributesByLocation(
+								locs.get(i));
+				for (LocationAttribute la : locationAttributes) {
+					if (la.getLocationAttributeType().getAttributeName()
+							.equals("AIC Location")
+							&& la.getAttributeValue().equals("true")) {
+						jsonResponse.put("loc_" + locSize, locs.get(i)
+								.getDescription()
+								+ " ("
+								+ locs.get(i).getLocationName() + ")");
 						locSize++;
 					}
 				}
-				
+
 			}
 			jsonResponse.put("loc_size", locSize);
 		} catch (JSONException e) {

@@ -1,39 +1,38 @@
+package com.ihsinformatics.gfatmweb.server;
 /* Copyright(C) 2016 Interactive Health Solutions, Pvt. Ltd.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 3 of the License (GPLv3), or any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
-You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
+ See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Interactive Health Solutions, info@ihsinformatics.com
+ You can also access the license on the internet at the address: http://www.gnu.org/licenses/gpl-3.0.html
 
-Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
+ Interactive Health Solutions, hereby disclaims all copyright interest in this program written by the contributors.
  */
 /**
  * 
  */
-package com.ihsinformatics.gfatmweb.server;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ihs.emailer.EmailEngine;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ihsinformatics.emailer.EmailEngine;
+import com.ihsinformatics.emailer.EmailException;
+import com.ihsinformatics.tbreachapi.core.TBR;
 import com.ihsinformatics.tbreachapi.core.service.impl.ServerService;
 import com.ihsinformatics.tbreachapi.model.Location;
 import com.ihsinformatics.util.DateTimeUtil;
@@ -47,15 +46,29 @@ import com.ihsinformatics.util.DateTimeUtil;
 public abstract class AbstractWebService extends HttpServlet {
 
 	private static final long serialVersionUID = -4482413651235453707L;
-	public static final String PROP_FILE_NAME = "tbreach-api.properties";
+	protected static final String PROP_FILE_NAME = "tbreach-api.properties";
 	protected HttpServletRequest request;
-	public static Properties prop;
 	public static ServerService apiService = new ServerService();
 	public static String guestUsername = "";
 	public static String guestPassword = "";
-	public static String ccUsername = "";
-	public static String ccPassword = "";
-	
+
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		if (!ServerService.isRunning()) {
+			TBR.readProperties(PROP_FILE_NAME);
+			guestUsername = TBR.getProps().getProperty("guest.username");
+			guestPassword = TBR.getProps().getProperty("guest.password");
+			apiService.startup(TBR.getProps());
+			apiService.login(guestUsername, guestPassword);
+		}
+		// Start email engine
+		try {
+			EmailEngine.instantiateEmailEngine(TBR.getProps());
+		} catch (EmailException e) {
+		}
+	}
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -112,7 +125,7 @@ public abstract class AbstractWebService extends HttpServlet {
 			String value = jsonobject.getString("value");
 			params.put(name, value);
 		}
-		params.put("endtime", DateTimeUtil.getSqlDateTime(new Date()));
+		params.put("endtime", DateTimeUtil.toSqlDateTimeString(new Date()));
 		return params;
 	}
 
@@ -126,7 +139,7 @@ public abstract class AbstractWebService extends HttpServlet {
 		try {
 			EmailEngine.getInstance().emailReportToAdmin(subject, text);
 			System.out.println("Email sent...");
-		} catch (MessagingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -138,19 +151,19 @@ public abstract class AbstractWebService extends HttpServlet {
 	public HttpServletRequest getRequest() {
 		return request;
 	}
-	
+
 	/* Project-specific methods */
 
 	/**
 	 * Imports user along with properties from OpenMRS DB into the database
+	 * 
 	 * @param username
 	 * @return
 	 */
 	protected boolean importUser(String username) {
 		try {
 			StringBuilder query = new StringBuilder();
-			// TODO: Complete query. Check importLocation method
-			List<List<Object>> user = apiService.getMetadataService().executeSQL(query.toString(), true);
+			apiService.getMetadataService().executeSQL(query.toString(), true);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -160,6 +173,7 @@ public abstract class AbstractWebService extends HttpServlet {
 
 	/**
 	 * Imports location along with properties from OpenMRS DB into the database
+	 * 
 	 * @param location
 	 * @return
 	 */
@@ -171,9 +185,11 @@ public abstract class AbstractWebService extends HttpServlet {
 			query.append("left outer join openmrs.location_attribute as pc on lt.location_id = l.location_id and lt.attribute_type_id = 2 ");
 			query.append("inner join openmrs.users as cr on cr.user_id = l.creator ");
 			query.append("where name = '" + location + "'");
-			List<List<Object>> data = apiService.getMetadataService().executeSQL(query.toString(), true);
+			List<List<Object>> data = apiService.getMetadataService()
+					.executeSQL(query.toString(), true);
 			if (data.size() == 0) {
-				System.out.println("ERROR: No location found matching given name.");
+				System.out
+						.println("ERROR: No location found matching given name.");
 				return false;
 			}
 			// We're interested only in first record
@@ -189,14 +205,18 @@ public abstract class AbstractWebService extends HttpServlet {
 			newLocation.setCountry(locationObj.get(counter++).toString());
 			newLocation.setLatitude(locationObj.get(counter++).toString());
 			newLocation.setLongitude(locationObj.get(counter++).toString());
-			newLocation.setPrimaryContact(locationObj.get(counter++).toString());
+			newLocation
+					.setPrimaryContact(locationObj.get(counter++).toString());
 			try {
-				newLocation.setDateCreated(DateTimeUtil.getDateFromString(locationObj.get(counter++).toString(), DateTimeUtil.SQL_DATETIME));
-			} catch (ParseException e) {
+				newLocation.setDateCreated(DateTimeUtil
+						.fromSqlDateString(locationObj.get(counter++)
+								.toString()));
+			} catch (Exception e) {
 			}
 			newLocation.setCreatedBy(ServerService.getCurrentUser());
 			newLocation.setUuid(locationObj.get(counter++).toString());
-			newLocation = apiService.getLocationService().saveLocation(newLocation);
+			newLocation = apiService.getLocationService().saveLocation(
+					newLocation);
 			return newLocation.getLocationId() != null;
 		} catch (SQLException e) {
 			e.printStackTrace();
